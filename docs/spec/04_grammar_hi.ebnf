@@ -38,8 +38,18 @@ RangeFact     = Value , "से" , Value , "तक"                             
               | Value , "-" , Value ;
 ChangeFact    = RangeFact , ChangeVerb                                        -> Change(dir, from, to)
               | Value , "से" , Value , "तक" , ChangeVerb
-              | Value , "की" , "बढ़त" ;
+              | Value , "की" , "बढ़त"
+              | ChangeParticiple ;
 ChangeVerb    = RISE | FALL ;
+
+(* Participle form, the usual translator output: कीमत 500 रुपये से गिरकर 400 रुपये हो गई
+   ChangeParticiple = [ Value , "से" ] , ( RISE_PART | FALL_PART ) , Value , [ CHANGE_COPULA ]
+   -> Change(dir, from?, to). Without the first Value, from is null.
+   Participle disambiguation: "से बढ़कर" is the comparison GT when no Value follows it,
+   and the change participle when a Value follows. Values may use ASCII digits and the word
+   रुपये/रुपए (currency lexicon) instead of the ₹ sign. The direction word is only a hint:
+   C-DIR recomputes it from the values and flags SOURCE_INCONSISTENT on a mismatch. *)
+ChangeParticiple = [ Value , "से" ] , ( RISE_PART | FALL_PART ) , Value , [ CHANGE_COPULA ] ;
 BoundFact     = Value , ( GT | LT )                                           -> Bound(op, v)    (* ₹५०० से ज़्यादा *)
               | ( GTE | LTE ) , Value                                          (* कम से कम ₹५०० *)
               | Value , ( GTE | LTE ) ;                                        (* ₹५०० अधिकतम is rare; accepted *)
