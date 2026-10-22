@@ -363,6 +363,18 @@ def _union(a: El, b: El, value, extra=()) -> El:
     )
 
 
+def _day_of(el) -> int | None:
+    """Day number from a plain integer or an ordinal literal (3rd, 3वाँ is not one)."""
+    if el is None:
+        return None
+    if _int_in(el, 1, 31):
+        return int(el.value.amount)
+    if el.kind == "LIT" and el.role == "ORDINAL" and el.attrs.get("text", "").isdigit():
+        n = int(el.attrs["text"])
+        return n if 1 <= n <= 31 else None
+    return None
+
+
 def merge_dates(els: list) -> list:
     out: list = []
     i = 0
@@ -377,14 +389,23 @@ def merge_dates(els: list) -> list:
         prev = out[-1] if out else None
         nxt = els[i + 1] if i + 1 < len(els) else None
         i += 1
-        if prev is not None and prev.sentence == el.sentence and _int_in(prev, 1, 31):
-            day = int(prev.value.amount)
+        if (
+            prev is not None
+            and prev.kind == "WORD"
+            and prev.key == "of"
+            and len(out) > 1
+            and out[-2].kind == "LIT"
+        ):  # '3rd of March'
+            out.pop()
+            prev = out[-1]
+        if prev is not None and prev.sentence == el.sentence and _day_of(prev):
+            day = _day_of(prev)
             merged = _union(prev, el, None)
             out.pop()
-        elif nxt is not None and _int_in(nxt, 1, 31) and nxt.sentence == el.sentence:
+        elif nxt is not None and _day_of(nxt) and nxt.sentence == el.sentence:
             after = els[i + 1] if i + 1 < len(els) else None
             if after is None or after.kind != "WORD" or after.key in DAY_FOLLOWERS:
-                day = int(nxt.value.amount)
+                day = _day_of(nxt)
                 merged = _union(el, nxt, None)
                 i += 1
         # year: optional comma, then a 4-digit number
@@ -493,6 +514,15 @@ def merge_dayparts(els: list) -> list:
                 )
                 i += 1
                 continue
+            if (  # 'सोमवार की सुबह': the genitive between the day and the part of the day
+                len(out) > 1
+                and out[-1].kind == "WORD"
+                and out[-1].key in (make_key("की"), make_key("के"))
+                and _is_val(out[-2], "DATE")
+                and out[-2].value.weekday is not None
+                and out[-2].value.daypart is None
+            ):
+                out.pop()
             if (
                 out
                 and _is_val(out[-1], "DATE")
@@ -667,6 +697,17 @@ def _share(lo_el: El, hi_el: El) -> tuple:
         lo = Time(hour, 0, period)
         if period:
             flags.add("PERIOD_SHARED")
+    elif (
+        lo.type == "TIME"
+        and hi.type == "TIME"
+        and lo.period is not None
+        and hi.period is None
+        and 1 <= hi.hour <= 12
+        and (lo.hour == 12 or lo.hour < hi.hour)
+        and hi.hour != 12
+    ):  # 'सुबह 9 बजे से 11 बजे तक': both ends are in the morning
+        hi = Time(hi.hour, hi.minute, lo.period)
+        flags.add("PERIOD_SHARED")
     return lo, hi, flags
 
 
@@ -974,6 +1015,13 @@ class ClauseParser:
             )
         if value.type in ("TIME", "DATE"):
             return self.add(TimeRel(rel="ON", anchor=value), start, i + 1, {"IMPLICIT_ON"})
+        if (
+            value.type in ("COUNT", "DURATION")
+            and value.amount == 1
+            and "WEAK_ONE" in self.els[i].flags
+        ):  # 'एक कप', 'a year': may be an article, so it is not a fact (spec 01 ASM-8)
+            self.diag("WEAK_ONE_DROPPED", i)
+            return i + 1
         return self.add(Quant(value=value, approx=approx), start, i + 1)
 
     def _range_from(self, i, start, j, form):
@@ -1032,9 +1080,10 @@ class ClauseParser:
         el = self.els[i]
         v = el.value
         numeric = v.type in OPERAND_TYPES
-        # V से PART V [COPULA]
-        if numeric and self.rel(i + 1, "FROM_OR_THAN") and self.rel(i + 2, *PART_ROLES):
-            end = self.hi_participle(i + 2, el, start)
+        # V [noun] से PART V [COPULA]
+        k = i + 1 + (1 if self.word(i + 1) and self.rel(i + 2, "FROM_OR_THAN") else 0)
+        if numeric and self.rel(k, "FROM_OR_THAN") and self.rel(k + 1, *PART_ROLES):
+            end = self.hi_participle(k + 1, el, start)
             if end is not None:
                 return end
         # V से बढ़कर V ... : the GT token read as the change participle
@@ -1068,12 +1117,13 @@ class ClauseParser:
                     Range(low=low, high=high, source_form="FROM_TO"), start, end, shared
                 )
         # V तक <verb>  |  V तक (up to)
-        if numeric and self.rel(i + 1, "TO_UNTIL"):
-            verb = self.rel(i + 2, "RISE", "FALL")
+        tak = self.tail_to(i + 1, ("TO_UNTIL",), limit=1) if numeric else None
+        if tak is not None:  # 'प्रति ग्राहक 5 आइटम तक': one unit noun may stand before तक
+            verb = self.rel(tak + 1, "RISE", "FALL")
             if verb is not None:
-                return self.add(Change(direction=verb.role, to=v), start, i + 3)
+                return self.add(Change(direction=verb.role, to=v), start, tak + 2)
             if v.type != "DURATION":
-                return self.add(Bound(op="LTE", value=v), start, i + 2, {"TAK_AS_UPTO"})
+                return self.add(Bound(op="LTE", value=v), start, tak + 1, {"TAK_AS_UPTO"})
         # V [की] <change word> [light verb]
         if numeric:
             k = i + 1
@@ -1150,7 +1200,15 @@ class ClauseParser:
             if not before:
                 continue
             for pidx, (pa, pb, pf) in enumerate(self.facts):
-                if isinstance(pf, (Bound, TimeRel)) and pb - 1 == before[-1]:
+                gap = [k for k in before if k >= pb]
+                near = pb - 1 == before[-1] or (
+                    isinstance(pf, Bound)  # '4 से अधिक मेहमानों की अनुमति नहीं है'
+                    and pb <= before[-1]
+                    and len(gap) <= 3
+                    and all(self.els[k].kind == "WORD" and k not in self.used for k in gap)
+                    and sum(isinstance(f, (Bound, TimeRel)) for _, _, f in self.facts) == 1
+                )
+                if isinstance(pf, (Bound, TimeRel)) and near:
                     fact.scope, fact.target = "REL", pf
                     fact.span = (pf.span[0], fact.span[1])
                     fact.flags |= pf.flags
@@ -1195,6 +1253,8 @@ def parse(text: str, lang: str) -> tuple:
         raise ValueError(f"unsupported language {lang!r}")
     res, nres = num.analyze(text, lang)
     els = merge_dayparts(merge_durations(merge_dates(build_elements(res, nres))))
+    if lang == "hi":
+        els = _hindi_idioms(els)
     diagnostics: list = []
     clauses: list = []
     for idx, ce in enumerate(segment(els, lang)):
@@ -1224,6 +1284,34 @@ def parse(text: str, lang: str) -> tuple:
         clauses.append(clause)
     sentence = Sentence(lang=lang, text=res.text, clauses=clauses, diagnostics=diagnostics)
     return sentence, res, nres
+
+
+_KUCH, _BHI, _LEKAR = make_key("कुछ"), make_key("भी"), make_key("लेकर")
+_FARK = {make_key(w) for w in ("फर्क", "फ़र्क", "फरक")}
+
+
+def _hindi_idioms(els: list) -> list:
+    """Hindi phrases whose parts must not be read on their own: 'से लेकर' (from ... to),
+    'कुछ भी' (anything, not a vague amount), 'फर्क नहीं पड़ता' (it does not matter)."""
+    out: list = []
+    for k, el in enumerate(els):
+        prev = out[-1] if out else None
+        nxt = els[k + 1] if k + 1 < len(els) else None
+        if (
+            el.kind == "WORD"
+            and el.key == _LEKAR
+            and prev is not None
+            and prev.role == "FROM_OR_THAN"
+        ):
+            continue
+        if el.kind == "VAL" and el.value.type == "VAGUE" and nxt is not None and nxt.key == _BHI:
+            el = El("WORD", el.start, el.end, el.text, key=_KUCH, flags=set(), sentence=el.sentence)
+        elif el.kind == "NEG" and prev is not None and prev.kind == "WORD" and prev.key in _FARK:
+            el = El(
+                "WORD", el.start, el.end, el.text, key=el.key, flags=set(), sentence=el.sentence
+            )
+        out.append(el)
+    return out
 
 
 def _lexer_only_facts(els: list) -> list:

@@ -203,7 +203,9 @@ class _Assembler:
                 after_scale = False
                 nxt = self._tok(j + 1)
                 if (
-                    nxt is not None and nxt.type == NUMWORD and nxt.attrs.get("unicode")
+                    nxt is not None
+                    and nxt.type == NUMWORD
+                    and nxt.attrs.get("unicode")
                     and nxt.start == t.end
                 ):
                     current += nxt.value
@@ -279,16 +281,23 @@ class _Assembler:
             if t.type == REL and t.key == "and" and not self.between_open:
                 nxt = self._tok(j + 1)
                 if (
-                    after_scale and small_limit == 100 and nxt is not None
-                    and nxt.type == NUMWORD and nxt.attrs.get("lang") == "en"
+                    after_scale
+                    and small_limit == 100
+                    and nxt is not None
+                    and nxt.type == NUMWORD
+                    and nxt.attrs.get("lang") == "en"
                     and nxt.attrs.get("kind") in ("unit", "tens")
                 ):
                     j += 1
                     continue
                 if (
-                    current is not None and not after_scale and nxt is not None
-                    and nxt.type == NUMWORD and nxt.attrs.get("kind") == "frac"
-                    and not nxt.attrs.get("unicode") and nxt.key in _EN_FRACTION_PHRASES
+                    current is not None
+                    and not after_scale
+                    and nxt is not None
+                    and nxt.type == NUMWORD
+                    and nxt.attrs.get("kind") == "frac"
+                    and not nxt.attrs.get("unicode")
+                    and nxt.key in _EN_FRACTION_PHRASES
                 ):
                     current += nxt.value
                     small_limit = 0
@@ -360,8 +369,7 @@ class _Assembler:
             probe += 1
             nxt = self._tok(probe)
         if nxt is not None and nxt.type == SCALE:
-            return _Expr(end=probe + 1, value=t.value * nxt.value, words=True,
-                         flags=set(nxt.flags))
+            return _Expr(end=probe + 1, value=t.value * nxt.value, words=True, flags=set(nxt.flags))
         if t.key == "quarter":  # "this quarter" is a period; "a quarter" and "three quarters" count
             return None
         expr = _Expr(end=k, value=t.value, words=True)
@@ -410,8 +418,9 @@ class _Assembler:
                 return None
             period = None
         end = expr.end + 1
-        return TimeLiteral(start, end, self._text(start, end), self._orig(start, end),
-                           hour, minute, period), end
+        return TimeLiteral(
+            start, end, self._text(start, end), self._orig(start, end), hour, minute, period
+        ), end
 
     # -- main loop --------------------------------------------------------------------------
     def run(self) -> NumericResult:
@@ -471,8 +480,9 @@ class _Assembler:
                 end += 1
             elif kind == "oclock":
                 end += 1
-        self.items.append(TimeLiteral(i, end, self._text(i, end), self._orig(i, end),
-                                      hour, minute, period))
+        self.items.append(
+            TimeLiteral(i, end, self._text(i, end), self._orig(i, end), hour, minute, period)
+        )
         return end
 
     def _finish(self, start: int, expr: _Expr) -> int:
@@ -496,20 +506,31 @@ class _Assembler:
             qtype = "PERCENT"
             end += 1
         flags = set(expr.flags)
-        for tok in self.toks[start:expr.end]:
+        for tok in self.toks[start : expr.end]:
             flags |= tok.flags
         if expr.single is not None:
             if expr.single.key in _ONE_WORDS:
                 flags.add("WEAK_ONE")
             if expr.single.key == "दो":
                 after = self._tok(end)
-                if after is None or after.type == SENT_END or (
-                    after.type == PUNCT and after.text not in "-–"
+                if (
+                    after is None
+                    or after.type == SENT_END
+                    or (after.type == PUNCT and after.text not in "-–")
                 ):
                     flags.add("AMBIGUOUS_NUMWORD")
         self.items.append(
-            Quantity(start, end, self._text(start, end), self._orig(start, end), clean(value),
-                     qtype, None, flags, expr.words)
+            Quantity(
+                start,
+                end,
+                self._text(start, end),
+                self._orig(start, end),
+                clean(value),
+                qtype,
+                None,
+                flags,
+                expr.words,
+            )
         )
         return end
 

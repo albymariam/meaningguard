@@ -61,6 +61,7 @@ CODES = {
     "DATE_ORDER_ASSUMED": ("info", "A numeric date was read day first."),
     "PERIOD_FROM_DAYPART": ("info", "AM or PM was taken from a part of the day."),
     "IMPLICIT_ON": ("info", "A time or date with no relation word was read as 'on'."),
+    "WEAK_ONE_DROPPED": ("info", "A lone 'one' or 'एक' may be an article and was not kept."),
     "APPROX_IN_COMPOUND": ("info", "An approximation word inside a comparison is not kept."),
     # semantics (02, 06)
     "SOURCE_INCONSISTENT": (

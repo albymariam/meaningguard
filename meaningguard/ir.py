@@ -176,8 +176,15 @@ def compile_text(text: str, lang: str, emotion: dict | None = None) -> IR:
         clauses=clauses,
         diagnostics=diagnostics,
         emotion=emotion,
-        fp=sentence_fp([c["fp"] for c in clauses]),
+        fp=sentence_fp(
+            [c["fp"] for c, k in zip(clauses, sentence.clauses, strict=True) if _counts(k)]
+        ),
     )
+
+
+def _counts(clause) -> bool:
+    """A clause with no fact, no negation and no condition says nothing checkable (spec 02)."""
+    return bool(clause.facts or clause.cond or clause.polarity == "NEG")
 
 
 def _tier(sentence: Sentence, nres) -> int:

@@ -24,10 +24,26 @@ NEEDS_NUMBER = {"अरब", "cr", "mn", "bn"}
 
 # Vague quantifiers and the power of ten they stand for (None: small, unspecific).
 VAGUE_ORDER = {
-    "hundreds": 2, "thousands": 3, "lakhs of": 5, "crores of": 7, "millions": 6,
-    "billions": 9, "dozens": 1, "several": None, "many": None, "few": None, "couple": None,
-    "सैकड़ों": 2, "हज़ारों": 3, "हजारों": 3, "लाखों": 5, "करोड़ों": 7, "अरबों": 9,
-    "कई": None, "कुछ": None, "दर्जनों": 1,
+    "hundreds": 2,
+    "thousands": 3,
+    "lakhs of": 5,
+    "crores of": 7,
+    "millions": 6,
+    "billions": 9,
+    "dozens": 1,
+    "several": None,
+    "many": None,
+    "few": None,
+    "couple": None,
+    "सैकड़ों": 2,
+    "हज़ारों": 3,
+    "हजारों": 3,
+    "लाखों": 5,
+    "करोड़ों": 7,
+    "अरबों": 9,
+    "कई": None,
+    "कुछ": None,
+    "दर्जनों": 1,
 }
 
 PERCENT_FORMS = ["%", "percent", "per cent", "प्रतिशत", "फ़ीसदी", "फीसदी"]
@@ -138,8 +154,15 @@ def get_lexicon() -> Lexicon:
     neg = _load("negation")
     for entry in neg["entries"]:
         for form in entry["forms"]:
-            lex.add(_phrase(form, "NEG", kind=entry["kind"], lang=entry["lang"],
-                            informal=bool(entry.get("informal"))))
+            lex.add(
+                _phrase(
+                    form,
+                    "NEG",
+                    kind=entry["kind"],
+                    lang=entry["lang"],
+                    informal=bool(entry.get("informal")),
+                )
+            )
     for item in neg["non_negating"]:
         if "tokens" in item:
             lex.non_negating.append((tuple(make_key(t) for t in item["tokens"]), item["role"]))
@@ -157,19 +180,36 @@ def get_lexicon() -> Lexicon:
                 style = "code"
             else:
                 style = "word"
-            lex.add(_phrase(form, "CURRENCY", code=code, style=style,
-                            ambiguous=low in {make_key(a) for a in AMBIGUOUS_CURRENCY}))
+            lex.add(
+                _phrase(
+                    form,
+                    "CURRENCY",
+                    code=code,
+                    style=style,
+                    ambiguous=low in {make_key(a) for a in AMBIGUOUS_CURRENCY},
+                )
+            )
 
     # --- scales ---
     scales = _load("scales")
     for item in scales["scales"]:
         for form in item["forms"]:
-            lex.add(_phrase(form, "SCALE", value=_dec(item["value"]), exact_unit=False,
-                            needs_number=form in NEEDS_NUMBER))
+            lex.add(
+                _phrase(
+                    form,
+                    "SCALE",
+                    value=_dec(item["value"]),
+                    exact_unit=False,
+                    needs_number=form in NEEDS_NUMBER,
+                )
+            )
     for item in scales["exact_units"]:
         for form in item["forms"]:
-            lex.add(_phrase(form, "SCALE", value=_dec(item["value"]), exact_unit=True,
-                            needs_number=False))
+            lex.add(
+                _phrase(
+                    form, "SCALE", value=_dec(item["value"]), exact_unit=True, needs_number=False
+                )
+            )
     for lang in ("en", "hi"):
         for form in scales["vague"][lang]:
             lex.add(_phrase(form, "VAGUE", lang=lang, order=VAGUE_ORDER.get(form)))
@@ -177,21 +217,42 @@ def get_lexicon() -> Lexicon:
     # --- relations ---
     for entry in _load("relations")["entries"]:
         for form in entry["forms"]:
-            lex.add(_phrase(form, "REL", role=entry["role"], lang=entry["lang"],
-                            position=entry.get("position", "")))
+            lex.add(
+                _phrase(
+                    form,
+                    "REL",
+                    role=entry["role"],
+                    lang=entry["lang"],
+                    position=entry.get("position", ""),
+                )
+            )
 
     # --- calendar ---
     cal = _load("calendar")
     for item in cal["weekdays"]:
         for lang in ("en", "hi"):
             for form in item[lang] + item.get(f"{lang}_plural", []):
-                lex.add(_phrase(form, "DAY", id=item["id"], lang=lang,
-                                ambiguous=make_key(form) in AMBIGUOUS_DATE_WORDS))
+                lex.add(
+                    _phrase(
+                        form,
+                        "DAY",
+                        id=item["id"],
+                        lang=lang,
+                        ambiguous=make_key(form) in AMBIGUOUS_DATE_WORDS,
+                    )
+                )
     for item in cal["months"]:
         for lang in ("en", "hi"):
             for form in item[lang]:
-                lex.add(_phrase(form, "MONTH", id=item["id"], lang=lang,
-                                ambiguous=make_key(form) in AMBIGUOUS_DATE_WORDS))
+                lex.add(
+                    _phrase(
+                        form,
+                        "MONTH",
+                        id=item["id"],
+                        lang=lang,
+                        ambiguous=make_key(form) in AMBIGUOUS_DATE_WORDS,
+                    )
+                )
     marks = cal["time_markers"]
     for kind in ("am", "pm", "oclock"):
         for form in marks[kind]:

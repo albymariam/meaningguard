@@ -76,7 +76,7 @@ violates the scale order (NUM-6) is a `SCALE_ORDER` error and yields no value.
 (node type, canonical attributes, child fingerprints in canonical order)`. A clause fingerprint covers
 its polarity, its conditional role, `weak` (any weak clause negation) and the fingerprints of its facts
 except clause-scope `NEG` facts, because polarity already carries them (so `unless you pay` and
-`यदि आप भुगतान नहीं करते` agree). A sentence fingerprint sorts its clause fingerprints, so a reordered
+`यदि आप भुगतान नहीं करते` agree). A sentence fingerprint sorts its clause fingerprints and leaves out clauses with no fact, no negation and no condition, so a reordered
 sentence (`A, if B` and `यदि B, तो A`) keeps it. Surface text, token
 positions and flags are excluded. Two nodes are equal if and only if their fingerprints match.
 Decimal values are serialized with `normalize()` and a fixed format, so `500000`, `5E+5` and

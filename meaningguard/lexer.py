@@ -23,14 +23,33 @@ from .lexicon import (
 MAX_CHARS = 1000
 
 ABBREVIATIONS = {
-    "rs", "no", "a.m.", "p.m.", "mr", "mrs", "dr", "st", "approx", "vs", "etc", "inr",
-    "ms", "prof", "jr", "sr",
+    "rs",
+    "no",
+    "a.m.",
+    "p.m.",
+    "mr",
+    "mrs",
+    "dr",
+    "st",
+    "approx",
+    "vs",
+    "etc",
+    "inr",
+    "ms",
+    "prof",
+    "jr",
+    "sr",
 }
 SENTENCE_STARTER_SYMBOLS = set(CURRENCY_SYMBOLS)
 
 # Token types
 NUMBER, NUMWORD, SCALE, VAGUE, CURRENCY, PERCENT = (
-    "NUMBER", "NUMWORD", "SCALE", "VAGUE", "CURRENCY", "PERCENT",
+    "NUMBER",
+    "NUMWORD",
+    "SCALE",
+    "VAGUE",
+    "CURRENCY",
+    "PERCENT",
 )
 NEG, REL, DAY, MONTH, TIMEMARK, DAYPART = "NEG", "REL", "DAY", "MONTH", "TIMEMARK", "DAYPART"
 TIME, WORD, PUNCT, SENT_END = "TIME", "WORD", "PUNCT", "SENT_END"
@@ -53,8 +72,14 @@ class InputTooLong(LexError):
 
 _DELETE = {"​", "‌", "‍", "﻿", "­"}
 _MAP = {
-    "‘": "'", "’": "'", "ʼ": "'", "“": '"', "”": '"',
-    "–": "-", "—": "-", "−": "-",
+    "‘": "'",
+    "’": "'",
+    "ʼ": "'",
+    "“": '"',
+    "”": '"',
+    "–": "-",
+    "—": "-",
+    "−": "-",
 }
 
 
@@ -101,6 +126,7 @@ def normalize(text: str) -> Normalized:
 
 # ---------------------------------------------------------------------------------------------
 # Tokens
+
 
 @dataclass
 class Token:
@@ -164,15 +190,31 @@ _RE_IDENT = re.compile(r"(?:[A-Za-z]+\d[A-Za-z0-9]*|[A-Z]{2,}-\d[A-Za-z0-9]*)")
 _RE_NO_ABBREV = re.compile(r"[Nn][Oo]\.\s?(?=\d)")
 
 _ATTACHED_SCALE = {
-    "k": (Decimal(1000), False), "l": (Decimal(100000), True), "cr": (Decimal(10000000), False),
-    "m": (Decimal(1000000), True), "mn": (Decimal(1000000), False),
-    "b": (Decimal(1000000000), True), "bn": (Decimal(1000000000), False),
+    "k": (Decimal(1000), False),
+    "l": (Decimal(100000), True),
+    "cr": (Decimal(10000000), False),
+    "m": (Decimal(1000000), True),
+    "mn": (Decimal(1000000), False),
+    "b": (Decimal(1000000000), True),
+    "bn": (Decimal(1000000000), False),
 }
 _IDENT_EXEMPT = None  # filled lazily from the lexicon
 
 _DATE_PRECEDERS = {
-    "in", "of", "on", "by", "since", "from", "until", "till", "before", "after", "during",
-    "this", "next", "last",
+    "in",
+    "of",
+    "on",
+    "by",
+    "since",
+    "from",
+    "until",
+    "till",
+    "before",
+    "after",
+    "during",
+    "this",
+    "next",
+    "last",
 }
 
 
@@ -215,6 +257,7 @@ def _ident_exempt() -> set:
 # ---------------------------------------------------------------------------------------------
 # Scanner
 
+
 class _Scanner:
     def __init__(self, norm: Normalized):
         self.norm = norm
@@ -230,7 +273,14 @@ class _Scanner:
     # -- emit helpers -----------------------------------------------------------------------
     def emit(self, type_, a, b, value=None, flags=(), **attrs) -> Token:
         token = Token(
-            type_, self.T[a:b], a, b, self.norm.span(a, b), self.sentence, value, set(flags),
+            type_,
+            self.T[a:b],
+            a,
+            b,
+            self.norm.span(a, b),
+            self.sentence,
+            value,
+            set(flags),
             dict(attrs),
         )
         self.tokens.append(token)
@@ -242,8 +292,14 @@ class _Scanner:
             if T[i] == " ":
                 i += 1
                 continue
-            for step in (self._sentence_end, self._number, self._ident, self._phrase,
-                         self._word, self._punct):
+            for step in (
+                self._sentence_end,
+                self._number,
+                self._ident,
+                self._phrase,
+                self._word,
+                self._punct,
+            ):
                 j = step(i)
                 if j is not None:
                     i = j
@@ -319,8 +375,11 @@ class _Scanner:
         if ch == "+":
             m = _RE_PLUS_PHONE.match(T, i)
             return self._opaque(i, m.end(), "PHONE") if m else None
-        if ch == "." and i + 1 < n and _is_digit(T[i + 1]) and (
-            i == 0 or not (is_word_char(T[i - 1]) or _is_digit(T[i - 1]) or T[i - 1] == ".")
+        if (
+            ch == "."
+            and i + 1 < n
+            and _is_digit(T[i + 1])
+            and (i == 0 or not (is_word_char(T[i - 1]) or _is_digit(T[i - 1]) or T[i - 1] == "."))
         ):
             return self._leading_decimal(i)
         if not _is_digit(ch):
@@ -373,8 +432,16 @@ class _Scanner:
                     word = attached.group(1).casefold()
                     scale, ambiguous = _ATTACHED_SCALE[word]
                     sflags = {"AMBIGUOUS_ABBREV"} if ambiguous else set()
-                    self.emit(SCALE, j, attached.end(), scale, sflags, attached=True,
-                              exact_unit=False, needs_number=False)
+                    self.emit(
+                        SCALE,
+                        j,
+                        attached.end(),
+                        scale,
+                        sflags,
+                        attached=True,
+                        exact_unit=False,
+                        needs_number=False,
+                    )
                     return attached.end()
             elif _is_devanagari_letter(c) and not frac:
                 ordinal = _RE_ORD_HI.match(T, j)
@@ -494,8 +561,11 @@ class _Scanner:
             if is_word_char(c):
                 j += 1
             elif (
-                c in "'-" and j > i and j + 1 < n
-                and is_word_char(T[j - 1]) and is_word_char(T[j + 1])
+                c in "'-"
+                and j > i
+                and j + 1 < n
+                and is_word_char(T[j - 1])
+                and is_word_char(T[j + 1])
             ):
                 j += 1
             else:
@@ -513,7 +583,9 @@ class _Scanner:
     def _punct(self, i):
         T, n = self.T, self.n
         if (
-            T[i] == "-" and i + 1 < n and _is_digit(T[i + 1])
+            T[i] == "-"
+            and i + 1 < n
+            and _is_digit(T[i + 1])
             and (i == 0 or not (is_word_char(T[i - 1]) or _is_digit(T[i - 1]) or T[i - 1] in "-/."))
         ):
             self.sign_at = i + 1  # a minus sign directly before a number belongs to the number
@@ -524,6 +596,7 @@ class _Scanner:
 
 # ---------------------------------------------------------------------------------------------
 # Post passes
+
 
 def _demote_bare_scales(tokens: list) -> None:
     """अरब, cr, mn, bn are scales only after a number."""
