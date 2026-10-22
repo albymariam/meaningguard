@@ -81,7 +81,10 @@ def test_a_tie_goes_to_the_more_confident_side():
 @pytest.mark.parametrize(
     "irony,surface,emotion,expected",
     [
-        (0.6, sig("neutral", 0.9), sig("neutral", 0.9), True),  # the irony score alone
+        (0.95, sig("positive", 0.9), sig("joy", 0.9), True),  # the irony score alone
+        (0.6, sig("positive", 0.9), sig("joy", 0.9), False),  # not ironic enough
+        (0.99, sig("neutral", 0.9), sig("neutral", 0.9), False),  # no stance, nothing to mock
+        (0.99, sig("neutral", 0.9), sig("joy", 0.9), True),
         (0.4, sig("positive", 0.8), sig("negative", 0.8), True),  # positive words, negative feeling
         (0.4, sig("negative", 0.8), sig("negative", 0.8), False),
         (0.2, sig("positive", 0.8), sig("negative", 0.8), False),  # below the low threshold

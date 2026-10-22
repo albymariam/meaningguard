@@ -27,9 +27,15 @@ The emotion `label` is the emotion model's top label if its probability >= `labe
 `uncertain`.
 
 ## 4. Sarcasm (source only, `possible_sarcasm`)
-True when the irony probability >= `irony_prob` (0.5), or >= `irony_low` (0.35) while the sentiment
-model reads positive and the emotion model reads negative, both usable. The translation is not
-judged for sarcasm (`null`); its loss is inferred from its sentiment (06 section 4).
+False when the sentiment and the emotion model both read the text as neutral (no stance, nothing to
+be sarcastic about). Otherwise true when the irony probability >= `irony_prob` (0.9), or >= `irony_low`
+(0.35) while the sentiment model reads positive and the emotion model reads negative, both usable.
+The irony model scores 0.98 on both "I just love it when my phone dies" and "I really love it when my
+phone battery lasts all day", so a sincere sentence can still be flagged; this is why it is only a
+warning. On the 28 dev rows (unreviewed labels) the irony-only cut at 0.5 gave precision 0.44, recall
+1.0; every true sarcastic row scored >= 0.98, so 0.9 loses nothing there. The cut is re-checked
+against human labels at Phase 9. The translation is not judged for sarcasm (`null`); its loss is
+inferred from its sentiment (06 section 4).
 
 ## 5. Limits
 - Sarcasm detection is the weakest part (small English-only model); it is reported as "possible".

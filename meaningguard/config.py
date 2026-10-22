@@ -47,7 +47,7 @@ class EmotionSettings:
 
     min_prob: float = 0.4  # a signal below this abstains
     label_prob: float = 0.5  # the emotion label needs at least this
-    irony_prob: float = 0.5  # sarcasm on the irony score alone
+    irony_prob: float = 0.9  # sarcasm on the irony score alone (tuned on dev, spec 08)
     irony_low: float = 0.35  # sarcasm when the surface sentiment contradicts the emotion
     max_length: int = 128  # tokens read by each classifier
 

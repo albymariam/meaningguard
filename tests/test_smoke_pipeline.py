@@ -139,3 +139,27 @@ def test_tone_checks_grade_the_models():
     assert {c.status for c in smoke.tone_checks(Checker("x", ["down"], source_ok=False))} == {
         "fail"
     }
+
+
+def test_tone_checks_warn_on_a_false_sarcasm_alarm():
+    from meaningguard.tone import ToneResult
+    from meaningguard.verifier import compare_tone
+
+    class Checker:
+        def check(self, source, target):
+            src = {
+                "sentiment": "positive",
+                "label": "joy",
+                "confidence": 0.9,
+                "possible_sarcasm": True,
+            }
+            tgt = {
+                "sentiment": "positive",
+                "label": "joy",
+                "confidence": 0.9,
+                "possible_sarcasm": None,
+            }
+            return ToneResult(src, tgt, compare_tone(src, tgt), [])
+
+    # the source reads positive in both samples; the first expects negative, the second positive
+    assert [c.status for c in smoke.tone_checks(Checker())] == ["warn", "warn"]

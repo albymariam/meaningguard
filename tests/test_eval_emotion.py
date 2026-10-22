@@ -130,3 +130,22 @@ def test_no_gold_is_reported(tmp_path, capsys):
     empty = sheet(tmp_path, "e.csv", ["s1,x,anger,,,,\n"])
     assert ev.main(["--labels", str(empty)]) == 1
     assert "no gold labels" in capsys.readouterr().out
+
+
+def test_irony_sweep():
+    irony = [
+        ("a", "A", True, 0.9, True),
+        ("b", "B", True, 0.55, True),
+        ("c", "C", False, 0.6, True),
+        ("d", "D", False, 0.1, False),
+    ]
+    sw = ev.sweep(irony, cuts=(0.5, 0.7))
+    assert (sw["0.5"]["tp"], sw["0.5"]["fp"], sw["0.5"]["fn"]) == (2, 1, 0)
+    assert (sw["0.7"]["tp"], sw["0.7"]["fp"], sw["0.7"]["fn"]) == (1, 0, 1)
+
+
+def test_evaluate_collects_irony_scores():
+    rows = [{"id": "a", "text": "A", "emotion": "anger", "sarcasm": True}]
+    r = rec("anger", "negative", True, [{"name": "irony:roberta", "sentiment": None, "prob": 0.8}])
+    res = ev.evaluate(rows, lambda t: r)
+    assert res["irony_scores"] == [("a", "A", True, 0.8, True)]

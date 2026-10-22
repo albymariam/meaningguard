@@ -156,12 +156,13 @@ def tone_checks(checker) -> list:
             if out.source is None:
                 return FAIL, "; ".join(out.notes)
             got = (out.source["sentiment"], out.target["sentiment"] if out.target else None)
-            detail = (
-                f"source {got[0]}, translation {got[1]}, findings {[f.code for f in out.findings]}"
-            )
+            codes = [f.code for f in out.findings]
+            detail = f"source {got[0]}, translation {got[1]}, findings {codes}"
             if out.notes:
                 detail += f"; notes: {'; '.join(out.notes)}"
-            return (PASS if got[0] == expected and not out.notes else WARN), detail
+            sincere = "SARCASM_POSSIBLY_LOST" not in codes  # neither sample is sarcastic
+            ok = got[0] == expected and not out.notes and sincere
+            return (PASS if ok else WARN), detail
 
         checks.append(_timed(f"tone: {source[:34]}", run))
     return checks

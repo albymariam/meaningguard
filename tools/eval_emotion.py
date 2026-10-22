@@ -109,6 +109,7 @@ def evaluate(rows: list, analyze_source, analyze_target=None, backs: dict | None
     per_signal: dict = {}
     target = Counter()
     mistakes = []
+    irony: list = []
     for row in rows:
         rec = analyze_source(row["text"])
         gold_sent = EMOTION_SENTIMENT.get(row["emotion"])
@@ -129,6 +130,10 @@ def evaluate(rows: list, analyze_source, analyze_target=None, backs: dict | None
             if rec["sentiment"] != gold_sent:
                 mistakes.append((row["id"], row["text"][:60], gold_sent, rec["sentiment"]))
         if row["sarcasm"] is not None:
+            score = next((g["prob"] for g in rec["signals"] if g["name"].startswith("irony")), None)
+            irony.append(
+                (row["id"], row["text"][:50], row["sarcasm"], score, rec["possible_sarcasm"])
+            )
             tp += row["sarcasm"] and rec["possible_sarcasm"]
             fp += (not row["sarcasm"]) and rec["possible_sarcasm"]
             fn += row["sarcasm"] and not rec["possible_sarcasm"]
@@ -150,6 +155,8 @@ def evaluate(rows: list, analyze_source, analyze_target=None, backs: dict | None
             "single_signal": {k: ratio(a, b) for k, (a, b) in sorted(per_signal.items())},
         },
         "sarcasm": prf(tp, fp, fn),
+        "irony_scores": irony,
+        "irony_sweep": sweep(irony),
         "target": {
             "rows": target["n"],
             "accuracy": ratio(target["ok"], target["n"]),
@@ -160,8 +167,24 @@ def evaluate(rows: list, analyze_source, analyze_target=None, backs: dict | None
     }
 
 
+def sweep(irony: list, cuts=(0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)) -> dict:
+    """Sarcasm precision/recall if the irony score alone were cut at each value."""
+    scored = [(gold, score) for _, _, gold, score, _ in irony if score is not None]
+    out = {}
+    for cut in cuts:
+        tp = sum(g and sc >= cut for g, sc in scored)
+        fp = sum((not g) and sc >= cut for g, sc in scored)
+        fn = sum(g and sc < cut for g, sc in scored)
+        out[str(cut)] = prf(tp, fp, fn)
+    return out
+
+
 def ratio(a, b):
     return round(a / b, 3) if b else None
+
+
+def ratio_or_na(value) -> str:
+    return "n/a" if value is None else f"{value:.2f}"
 
 
 def show(result: dict) -> None:
@@ -175,6 +198,14 @@ def show(result: dict) -> None:
         f"sarcasm: precision {sar['precision']}, recall {sar['recall']}, f1 {sar['f1']} "
         f"(tp {sar['tp']}, fp {sar['fp']}, fn {sar['fn']})"
     )
+    print("irony score by row (gold sarcasm / predicted):")
+    for rid, text, gold, score, pred in sorted(result["irony_scores"], key=lambda r: -(r[3] or 0)):
+        shown = "n/a" if score is None else f"{score:.2f}"
+        print(f"  {shown} gold={'Y' if gold else 'N'} pred={'Y' if pred else 'N'} {rid} {text}")
+    print("cut on the irony score alone:")
+    for cut, m in result["irony_sweep"].items():
+        prec, rec = ratio_or_na(m["precision"]), ratio_or_na(m["recall"])
+        print(f"  >= {cut}: precision {prec}, recall {rec}")
     if tgt["rows"]:
         print(
             f"translation sentiment: accuracy {tgt['accuracy']}, "

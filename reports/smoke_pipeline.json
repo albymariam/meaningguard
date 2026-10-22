@@ -3,31 +3,31 @@
     "name": "translate+verify [cold (loads the model)]: The price fell from Rs. 500 to Rs.",
     "status": "pass",
     "detail": "कीमत 500 रुपये से गिरकर 400 रुपये हो गई, इसलिए शुक्रवार के बाद भुगतान न करें। [pass: -]",
-    "seconds": 44.79
+    "seconds": 29.24
   },
   {
     "name": "translate+verify [warm]: Pay ₹5 lakh by 30 June or a fine o",
     "status": "pass",
     "detail": "30 जून तक ₹5 लाख का भुगतान करें या ₹2,000 का जुर्माना लागू होता है। [pass: -]",
-    "seconds": 6.47
+    "seconds": 7.57
   },
   {
     "name": "translate+verify [warm]: If you pay at least ₹5,000 before ",
     "status": "pass",
     "detail": "यदि आप 30 जून से पहले कम से कम ₹5,000 का भुगतान करते हैं, तो आपको 10 प्रतिशत की छूट मिलती है। [pass: -]",
-    "seconds": 11.11
+    "seconds": 14.16
   },
   {
     "name": "translate+verify [warm]: The meeting starts at 10:30 AM on ",
     "status": "pass",
     "detail": "बैठक सोमवार को सुबह 10:30 बजे शुरू होती है। [pass: -]",
-    "seconds": 4.06
+    "seconds": 4.08
   },
   {
     "name": "translate+verify [warm]: Orders above ₹1,000 ship free, oth",
     "status": "pass",
     "detail": "₹1,000 से अधिक के ऑर्डर निःशुल्क हैं, अन्यथा शिपिंग ₹60 है। [pass: -]",
-    "seconds": 5.09
+    "seconds": 5.65
   },
   {
     "name": "repair example (provided translation)",
@@ -50,19 +50,19 @@
   {
     "name": "latency",
     "status": "pass",
-    "detail": "warm median 5.78 s, cold 44.79 s",
+    "detail": "warm median 6.61 s, cold 29.24 s",
     "seconds": 0.0
   },
   {
     "name": "tone: I am furious that they cancelled m",
     "status": "pass",
     "detail": "source negative, translation negative, findings []",
-    "seconds": 37.14
+    "seconds": 37.26
   },
   {
     "name": "tone: We won the match, I am so happy!",
     "status": "pass",
-    "detail": "source positive, translation positive, findings ['SARCASM_POSSIBLY_LOST']",
-    "seconds": 4.07
+    "detail": "source positive, translation positive, findings []",
+    "seconds": 3.01
   }
 ]

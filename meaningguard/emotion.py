@@ -120,8 +120,15 @@ def _signal(prefix: str, text_scores: dict, kind: str) -> Signal:
     return Signal(f"{kind}:{prefix}", label, prob, sentiment)
 
 
+def _neutral(signal: Signal | None, s) -> bool:
+    return signal is not None and signal.label == "neutral" and signal.prob >= s.min_prob
+
+
 def is_sarcastic(irony_prob: float, surface: Signal | None, emotion: Signal | None, s) -> bool:
-    """Irony score alone, or a lower score when the words sound positive but the emotion is not."""
+    """Irony score alone, or a lower score when the words sound positive but the emotion is not.
+    Text that sentiment and emotion both read as neutral is never sarcastic (no stance)."""
+    if _neutral(surface, s) and _neutral(emotion, s):
+        return False
     if irony_prob >= s.irony_prob:
         return True
     conflict = (
