@@ -42,6 +42,13 @@ ChangeFact    = RangeFact , ChangeVerb                                        ->
               | ChangeParticiple ;
 ChangeVerb    = RISE | FALL ;
 
+(* Delta and noun forms, common in translator output:
+     ChangeDelta = Value , ChangeVerb                                  कीमतें ₹50 बढ़ गईं      -> Change(dir, delta)
+     ChangeNoun  = Value , "की" , ( RISE_NOUN | FALL_NOUN ) , [ LightVerb ]
+                                                                        बिक्री में 12.5% की वृद्धि हुई -> Change(dir, delta)
+     LightVerb   = "हुई" | "हुआ" | "आई" | "आया" | "हुए" ;
+   Both are added to ChangeFact. The delta carries no from/to. *)
+
 (* Participle form, the usual translator output: कीमत 500 रुपये से गिरकर 400 रुपये हो गई
    ChangeParticiple = [ Value , "से" ] , ( RISE_PART | FALL_PART ) , Value , [ CHANGE_COPULA ]
    -> Change(dir, from?, to). Without the first Value, from is null.

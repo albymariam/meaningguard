@@ -1,13 +1,16 @@
 # 01 Lexical specification (v1)
 
-Status: draft for review. The Hindi parts need review by a fluent speaker before Phase 3.
+Status: implemented in `meaningguard/lexer.py`, `lexicon.py` and `numerics.py`. A native Hindi speaker has reviewed the Hindi parts.
 
 ## 1. Input contract
 - One sentence per call, 1 to 1000 characters. Empty or whitespace-only input raises `EmptyInput`;
   longer input raises `InputTooLong`.
 - Multi-sentence text is split first. `.` ends a sentence only if followed by whitespace and an
-  uppercase Latin or Devanagari letter, or by end of text, and the word before it is not in the
-  abbreviation list `{rs, no, a.m., p.m., mr, mrs, dr, st, approx, vs, etc, inr}`.
+  uppercase Latin letter, a Devanagari letter, a digit or a currency symbol, or by end of text, and the
+  word before it is not in the abbreviation list `{rs, no, a.m., p.m., mr, mrs, dr, st, approx, vs,
+  etc, inr, ms, prof, jr, sr}` or a single capital initial (`A.`). `no` is an abbreviation only
+  before a digit (`No. 5`), so `I said no. Then left.` is two sentences. Closing quotes and
+  brackets after a sentence end stay in that sentence. A run of `?!।॥` is one `SENT_END`.
   `?`, `!`, `।` (U+0964) and `॥` (U+0965) always end a sentence.
 
 ## 2. Normalization (applied in this order; offsets map back to the original text)
@@ -35,6 +38,8 @@ Status: draft for review. The Hindi parts need review by a fluent speaker before
 | `REL` | comparison, range, condition and time-relation words | `relations.json`; carries `role` |
 | `DAY`, `MONTH` | weekday and month names | `calendar.json` |
 | `TIMEMARK` | AM, PM, a.m., p.m., o'clock, बजे | |
+| `TIME` | clock literal `H:MM` or `H:MM:SS` (hour at most 24, minute at most 59) | carries `hour`, `minute` |
+| `DAYPART` | morning, noon, evening, night, सुबह, दोपहर, शाम, रात | |
 | `WORD` | other letters (Latin or Devanagari, plus internal `'` and `-`) | |
 | `PUNCT` | any other single non-space character except the sentence enders | |
 | `SENT_END` | `. ? ! । ॥` per section 1 | not part of any word |
@@ -59,11 +64,28 @@ prototype lexer, where the danda was inside the word range and could hide a nega
 | NUM-8 | Hindi fraction words: `सवा` (+0.25), `डेढ़` (1.5), `ढाई` (2.5), `साढ़े` (+0.5), `पौने` (-0.25), `आधा` (0.5). Rules in `02_types_semantics.md` section 4. |
 | NUM-9 | Range: two numbers joined by `-`, `to`, `से ... तक` is a range construct handled by the parser, not the lexer. |
 | NUM-10 | Not quantities (stay `WORD`/`PUNCT`, flag `NON_QUANTITY`): `No. 5`, `Rs.` without a number, phone numbers (10 or more digits with no separators, or `+\d{1,3}[ -]\d{5,}`), version numbers `\d+\.\d+\.\d+`, dates `\d{1,2}[/-]\d{1,2}[/-]\d{2,4}`, ordinals (`1st`, `2nd`, `3rd`, `4th`, `पहला`). |
+| NUM-12 | Identifiers (Latin letters glued to digits: `A5`, `H2O`, `MP3`, `COVID-19`) are one `WORD` with flag `NON_QUANTITY`. Currency codes and month/day words are exempt (`Rs5`, `USD500`, `Jan5`). Digits followed by letters stay a number plus a word (`5km` is `NUMBER WORD`). |
+| NUM-13 | A `-` directly before a digit, with no word character, digit, `-`, `/` or `.` before it, is a minus sign: `-5` is the number -5 (flag `NEGATIVE`). `5-10` and `₹500-₹600` are not negative. |
+| NUM-14 | A leading decimal `.5` is 0.5 when no word character or digit precedes the dot. |
+| NUM-15 | Phone numbers, numeric dates, versions, ordinals, `No. 5` and identifiers are opaque `WORD` tokens (`attrs.opaque`, `attrs.digits` in ASCII digits). The verifier may compare them as exact strings. A bare run of 10 or more digits is phone-like; a grouped number (`1,00,00,00,000`) is not. |
 | NUM-11 | Time: `\d{1,2}:\d{2}` and `\d{1,2}\s?(AM|PM|a.m.|p.m.)` and `N बजे` are `TIME` literals, not counts. |
+
+### 4.1 Number assembly (numerics.py)
+| Id | Rule |
+|---|---|
+| ASM-1 | Digits, number words and scales are evaluated left to right as `Decimal`. Hindi words below 100 are atomic (`अट्ठाईस`); English `twenty-five` joins tens and units, with `and` allowed after a scale (`five hundred and five`). `and` is a range separator, not part of a number, after `between`. |
+| ASM-2 | A digit group after a scale needs its own smaller scale: `5 lakh 20 thousand` is 520000, but `5 lakh 20` is two quantities. Number words after a scale add (`पाँच हज़ार दो सौ` is 5200). Words that do not combine (`five 10`, `दो-तीन`) are separate quantities. |
+| ASM-3 | `a`/`an` before a scale means one (`a hundred`). `dozen`/`दर्जन` multiply by 12 and are exempt from scale order. A scale word with no number (`lakh`) is 1 times the scale with flag `BARE_SCALE`. |
+| ASM-4 | Fractions: `सवा`, `साढ़े`, `पौने`, `डेढ़`, `ढाई`, `आधा` as in `numbers_hi.json`; `पौने` with no number is 0.75; `साढ़े` with no number is not a quantity. English `half a million`, `a quarter of a crore`, `N and a half`, and `½ ¼ ¾` (`1½ lakh`). A fraction below 1 with no scale (`half`, `आधा`, `a quarter`, `three quarters`) is a quantity with flag `FRACTION_WORD`; a bare `quarter` ("this quarter") is a period, not a quantity. |
+| ASM-5 | Times from words: `N बजे`, `N o'clock`, `N AM/PM` (1 to 12 for AM/PM, 0 to 24 otherwise); Hindi `सवा N बजे` = N:15, `साढ़े N बजे` = N:30, `पौने N बजे` = (N-1):45, `डेढ़ बजे` = 1:30, `ढाई बजे` = 2:30. Out-of-range values stay quantities. |
+| ASM-6 | A number followed by a percent token is `PERCENT`. Otherwise `COUNT`, or `MONEY` once a currency attaches. |
+| ASM-7 | Currency attachment, by token style: symbols (`₹ $ € £ ¥`) attach to the number after them; `/-` attaches to the number before; codes (`Rs`, `INR`, `USD`, `रु.`) prefer the number after, then before; words (`rupees`, `रुपये`, `dollars`) prefer the number before, then after. Each number takes at most one currency; a second, different currency next to a claimed number sets `CURRENCY_CONFLICT`. `pound(s)` followed by `of` is a weight, not money. In `5 से 10 रुपये` only the second number has a currency; the parser applies it to the range (rule C-CUR-RANGE). |
+| ASM-8 | `one` is not a quantity when it is a pronoun (`one of`, `the one`, `which one`, `no one`). `एक`/`one` alone is a quantity with flag `WEAK_ONE`, which the verifier treats as optional (it can be an article). `दो` at a clause end may be the verb "give": flag `AMBIGUOUS_NUMWORD`. |
+| ASM-9 | Spaced scale words `cr`, `mn`, `bn`, `अरब` are scales only after a number; otherwise plain words. |
 
 ## 5. Flags
 `MIXED_DIGIT_SCRIPT`, `COMMA_DECIMAL_SUSPECT`, `DOT_THOUSANDS_SUSPECT`, `AMBIGUOUS_ABBREV`,
-`NON_QUANTITY`, `INFORMAL_NEG`, `MIXED_SCRIPT` (sentence has Latin and Devanagari words),
+`NON_QUANTITY`, `NEGATIVE`, `INFORMAL_NEG`, `AMBIGUOUS_CURRENCY`, `CURRENCY_CONFLICT`, `WEAK_ONE`, `AMBIGUOUS_NUMWORD`, `FRACTION_WORD`, `BARE_SCALE`, `MIXED_SCRIPT` (sentence has Latin and Devanagari words),
 `UNTRANSLATED_LATIN` (Hindi output contains Latin words of 3 or more letters that are not
 brand names in the lexicon). Flags never change a value; they lower confidence and are shown in the UI.
 

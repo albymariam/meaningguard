@@ -56,6 +56,7 @@ violates the scale order (NUM-6) is a `SCALE_ORDER` error and yields no value.
 |---|---|
 | C-NUM | Fold every number expression to one Decimal (constant folding). `5 lakh` = `500000` = `पाँच लाख` = `5,00,000`. |
 | C-CUR | Map every currency token to its ISO code. |
+| C-CUR-RANGE | In a RANGE, CHANGE or paired BOUND, a number with no currency inherits the currency of the other number (`5 से 10 रुपये`, `from 5 to Rs. 10`). Inheritance applies only inside one construct and never across clauses. |
 | C-DIR | `CHANGE.direction` is computed from the sign of `to - from` when both exist. The verb is only a consistency check: a mismatch (`rose from 500 to 400`) flags `SOURCE_INCONSISTENT` and is never repaired. |
 | C-UNLESS | `COND(UNLESS, A, B)` becomes `COND(IF, NEG(A), B)`. Hindi `जब तक A नहीं, B` becomes the same form, with info diagnostic `UNTIL_AS_UNLESS` (the Hindi construction is closer to "until"; the approximation is recorded, not hidden). |
 | C-TIMEREL | `BY` and `UNTIL` and Hindi `तक` become `ON_OR_BEFORE` (flag `BY_UNTIL_AMBIGUOUS` at info level). `NEG(AFTER x)` becomes `ON_OR_BEFORE x`; `NEG(BEFORE x)` becomes `ON_OR_AFTER x`. |

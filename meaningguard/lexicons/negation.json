@@ -10,38 +10,285 @@
     "AMBIG": "ambiguous; never counted as negation on its own"
   },
   "entries": [
-    {"lang": "en", "kind": "NEG", "forms": ["not", "no", "never", "cannot"]},
-    {"lang": "en", "kind": "NEG", "forms": ["don't", "doesn't", "didn't", "won't", "can't", "isn't", "aren't", "wasn't", "weren't", "shouldn't", "wouldn't", "couldn't", "haven't", "hasn't", "hadn't", "mustn't", "needn't", "shan't", "ain't"]},
-    {"lang": "en", "kind": "NEG", "informal": true, "forms": ["dont", "doesnt", "didnt", "wont", "cant", "isnt", "arent", "wasnt", "werent", "shouldnt", "wouldnt", "couldnt"]},
-    {"lang": "en", "kind": "NEG", "forms": ["no longer", "not any"]},
-    {"lang": "en", "kind": "NEG_PRON", "forms": ["none", "nothing", "nobody", "nowhere", "no one"]},
-    {"lang": "en", "kind": "NEG_PREP", "forms": ["without"]},
-    {"lang": "en", "kind": "NEG_WEAK", "forms": ["hardly", "barely", "scarcely", "rarely", "seldom"]},
-    {"lang": "en", "kind": "NEG_CORR", "forms": ["neither", "nor"]},
-    {"lang": "hi", "kind": "NEG", "forms": ["नहीं", "नही", "कभी नहीं", "कभी नही"]},
-    {"lang": "hi", "kind": "PROHIB", "forms": ["मत"]},
-    {"lang": "hi", "kind": "NEG_PREP", "forms": ["बिना", "बगैर", "बग़ैर"]},
-    {"lang": "hi", "kind": "NEG_PRON", "forms": ["कुछ नहीं", "कोई नहीं", "कोई भी नहीं", "किसी को नहीं"]},
-    {"lang": "hi", "kind": "NEG_WEAK", "forms": ["शायद ही", "मुश्किल से"]},
-    {"lang": "hi", "kind": "NEG_CORR", "forms": ["न"]},
-    {"lang": "hi", "kind": "AMBIG", "forms": ["ना"]}
+    {
+      "lang": "en",
+      "kind": "NEG",
+      "forms": [
+        "not",
+        "no",
+        "never",
+        "cannot"
+      ]
+    },
+    {
+      "lang": "en",
+      "kind": "NEG",
+      "forms": [
+        "don't",
+        "doesn't",
+        "didn't",
+        "won't",
+        "can't",
+        "isn't",
+        "aren't",
+        "wasn't",
+        "weren't",
+        "shouldn't",
+        "wouldn't",
+        "couldn't",
+        "haven't",
+        "hasn't",
+        "hadn't",
+        "mustn't",
+        "needn't",
+        "shan't",
+        "ain't"
+      ]
+    },
+    {
+      "lang": "en",
+      "kind": "NEG",
+      "informal": true,
+      "forms": [
+        "dont",
+        "doesnt",
+        "didnt",
+        "wont",
+        "cant",
+        "isnt",
+        "arent",
+        "wasnt",
+        "werent",
+        "shouldnt",
+        "wouldnt",
+        "couldnt"
+      ]
+    },
+    {
+      "lang": "en",
+      "kind": "NEG",
+      "forms": [
+        "no longer",
+        "not any"
+      ]
+    },
+    {
+      "lang": "en",
+      "kind": "NEG_PRON",
+      "forms": [
+        "none",
+        "nothing",
+        "nobody",
+        "nowhere",
+        "no one"
+      ]
+    },
+    {
+      "lang": "en",
+      "kind": "NEG_PREP",
+      "forms": [
+        "without"
+      ]
+    },
+    {
+      "lang": "en",
+      "kind": "NEG_WEAK",
+      "forms": [
+        "hardly",
+        "barely",
+        "scarcely",
+        "rarely",
+        "seldom"
+      ]
+    },
+    {
+      "lang": "en",
+      "kind": "NEG_CORR",
+      "forms": [
+        "neither",
+        "nor"
+      ]
+    },
+    {
+      "lang": "hi",
+      "kind": "NEG",
+      "forms": [
+        "नहीं",
+        "नही",
+        "कभी नहीं",
+        "कभी नही"
+      ]
+    },
+    {
+      "lang": "hi",
+      "kind": "PROHIB",
+      "forms": [
+        "मत"
+      ]
+    },
+    {
+      "lang": "hi",
+      "kind": "NEG_PREP",
+      "forms": [
+        "बिना",
+        "बगैर",
+        "बग़ैर"
+      ]
+    },
+    {
+      "lang": "hi",
+      "kind": "NEG_PRON",
+      "forms": [
+        "कुछ नहीं",
+        "कोई नहीं",
+        "कोई भी नहीं",
+        "किसी को नहीं"
+      ]
+    },
+    {
+      "lang": "hi",
+      "kind": "NEG_WEAK",
+      "forms": [
+        "शायद ही",
+        "मुश्किल से"
+      ]
+    },
+    {
+      "lang": "hi",
+      "kind": "NEG_CORR",
+      "forms": [
+        "न"
+      ]
+    },
+    {
+      "lang": "hi",
+      "kind": "AMBIG",
+      "forms": [
+        "ना"
+      ]
+    }
   ],
   "non_negating": [
-    {"lang": "en", "tokens": ["not", "only"], "role": "NOT_ONLY"},
-    {"lang": "en", "tokens": ["not", "just"], "role": "NOT_ONLY"},
-    {"lang": "en", "tokens": ["no", "matter"], "role": "CONCESSIVE"},
-    {"lang": "en", "tokens": ["no", "doubt"], "role": "EMPHASIS"},
-    {"lang": "en", "pattern": "no\\.\\s?\\d", "role": "NUMBER_ABBREV", "note": "'No. 5' means number 5"},
-    {"lang": "hi", "tokens": ["नहीं", "तो"], "role": "COND_ELSE", "note": "'otherwise'"},
-    {"lang": "hi", "tokens": ["न", "केवल"], "role": "NOT_ONLY"},
-    {"lang": "hi", "tokens": ["न", "सिर्फ़"], "role": "NOT_ONLY"},
-    {"lang": "hi", "tokens": ["है", "न"], "role": "TAG_QUESTION", "note": "tag question when followed by ? or sentence end"},
-    {"lang": "hi", "tokens": ["ना", "?"], "role": "TAG_QUESTION"},
-    {"lang": "hi", "tokens": ["कहीं", "न", "कहीं"], "role": "EMPHASIS"}
+    {
+      "lang": "en",
+      "tokens": [
+        "not",
+        "only"
+      ],
+      "role": "NOT_ONLY"
+    },
+    {
+      "lang": "en",
+      "tokens": [
+        "not",
+        "just"
+      ],
+      "role": "NOT_ONLY"
+    },
+    {
+      "lang": "en",
+      "tokens": [
+        "no",
+        "matter"
+      ],
+      "role": "CONCESSIVE"
+    },
+    {
+      "lang": "en",
+      "tokens": [
+        "no",
+        "doubt"
+      ],
+      "role": "EMPHASIS"
+    },
+    {
+      "lang": "en",
+      "pattern": "no\\.\\s?\\d",
+      "role": "NUMBER_ABBREV",
+      "note": "'No. 5' means number 5"
+    },
+    {
+      "lang": "hi",
+      "tokens": [
+        "नहीं",
+        "तो"
+      ],
+      "role": "COND_ELSE",
+      "note": "'otherwise'"
+    },
+    {
+      "lang": "hi",
+      "tokens": [
+        "न",
+        "केवल"
+      ],
+      "role": "NOT_ONLY"
+    },
+    {
+      "lang": "hi",
+      "tokens": [
+        "न",
+        "सिर्फ़"
+      ],
+      "role": "NOT_ONLY"
+    },
+    {
+      "lang": "hi",
+      "tokens": [
+        "है",
+        "न"
+      ],
+      "role": "TAG_QUESTION",
+      "note": "tag question when followed by ? or sentence end"
+    },
+    {
+      "lang": "hi",
+      "tokens": [
+        "ना",
+        "?"
+      ],
+      "role": "TAG_QUESTION"
+    },
+    {
+      "lang": "hi",
+      "tokens": [
+        "कहीं",
+        "न",
+        "कहीं"
+      ],
+      "role": "EMPHASIS"
+    },
+    {
+      "lang": "hi",
+      "tokens": [
+        "हैं",
+        "न"
+      ],
+      "role": "TAG_QUESTION",
+      "note": "plural form of है न"
+    },
+    {
+      "lang": "hi",
+      "tokens": [
+        "क्यों",
+        "न"
+      ],
+      "role": "SUGGESTION",
+      "note": "'why not' as a suggestion"
+    },
+    {
+      "lang": "en",
+      "tokens": [
+        "why",
+        "not"
+      ],
+      "role": "SUGGESTION"
+    }
   ],
   "notes": [
     "कभी alone is not a negator. Only कभी नहीं is, and it is matched as one entry.",
     "न is NEG_CORR only in pairs (न ... न) or when it directly negates a verb; sentence-final न after है is a tag question.",
-    "ना is never counted without a verb-negation reading confirmed by the parser."
+    "ना is never counted without a verb-negation reading confirmed by the parser.",
+    "A non_negating token sequence disables counting for the negator inside it. TAG_QUESTION also requires a sentence end or ? right after the sequence."
   ]
 }

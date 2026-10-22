@@ -107,7 +107,25 @@
         "went up",
         "climbed",
         "jumped",
-        "surged"
+        "surged",
+        "rise",
+        "rises",
+        "rising",
+        "increase",
+        "increases",
+        "increasing",
+        "grow",
+        "grows",
+        "growing",
+        "climb",
+        "climbs",
+        "jump",
+        "jumps",
+        "surge",
+        "surges",
+        "go up",
+        "goes up",
+        "going up"
       ]
     },
     {
@@ -122,7 +140,26 @@
         "declined",
         "went down",
         "dipped",
-        "plunged"
+        "plunged",
+        "fall",
+        "falls",
+        "falling",
+        "decrease",
+        "decreases",
+        "decreasing",
+        "decline",
+        "declines",
+        "declining",
+        "drop",
+        "drops",
+        "dropping",
+        "dip",
+        "dips",
+        "plunge",
+        "plunges",
+        "go down",
+        "goes down",
+        "going down"
       ]
     },
     {
@@ -309,7 +346,39 @@
         "बढ़ गयी",
         "चढ़ा",
         "चढ़ गया",
-        "उछला"
+        "उछला",
+        "बढ़ीं",
+        "बढ़ गईं",
+        "बढ़ गयीं",
+        "बढ़ गये",
+        "बढ़ रहा",
+        "बढ़ रही",
+        "बढ़ रहे",
+        "चढ़ी",
+        "चढ़े",
+        "चढ़ीं",
+        "चढ़ गई",
+        "चढ़ गए",
+        "चढ़ गईं",
+        "चढ़ गयी",
+        "चढ़ गयीं",
+        "चढ़ गये",
+        "चढ़ रहा",
+        "चढ़ रही",
+        "चढ़ रहे",
+        "उछली",
+        "उछले",
+        "उछलीं",
+        "उछल गया",
+        "उछल गई",
+        "उछल गए",
+        "उछल गईं",
+        "उछल गयी",
+        "उछल गयीं",
+        "उछल गये",
+        "उछल रहा",
+        "उछल रही",
+        "उछल रहे"
       ]
     },
     {
@@ -330,8 +399,91 @@
         "गिर गई",
         "कम हुआ",
         "कम हुई",
-        "कम हुए"
+        "कम हुए",
+        "घटीं",
+        "घट गईं",
+        "घट गयी",
+        "घट गयीं",
+        "घट गये",
+        "घट रहा",
+        "घट रही",
+        "घट रहे",
+        "गिरीं",
+        "गिर गए",
+        "गिर गईं",
+        "गिर गयी",
+        "गिर गयीं",
+        "गिर गये",
+        "गिर रहा",
+        "गिर रही",
+        "गिर रहे",
+        "लुढ़का",
+        "लुढ़की",
+        "लुढ़के",
+        "लुढ़कीं",
+        "लुढ़क गया",
+        "लुढ़क गई",
+        "लुढ़क गए",
+        "लुढ़क गईं",
+        "लुढ़क गयी",
+        "लुढ़क गयीं",
+        "लुढ़क गये",
+        "लुढ़क रहा",
+        "लुढ़क रही",
+        "लुढ़क रहे",
+        "कम हुईं",
+        "कम हो गया",
+        "कम हो गई",
+        "कम हो गए"
       ]
+    },
+    {
+      "role": "RISE_NOUN",
+      "lang": "en",
+      "position": "noun",
+      "forms": [
+        "growth",
+        "hike",
+        "gain"
+      ],
+      "note": "noun-only forms; rise/increase/jump/surge are listed under RISE (verb or noun)"
+    },
+    {
+      "role": "FALL_NOUN",
+      "lang": "en",
+      "position": "noun",
+      "forms": [
+        "reduction",
+        "cut"
+      ],
+      "note": "noun-only forms; fall/decrease/decline/drop are listed under FALL (verb or noun)"
+    },
+    {
+      "role": "RISE_NOUN",
+      "lang": "hi",
+      "position": "noun",
+      "forms": [
+        "वृद्धि",
+        "बढ़ोतरी",
+        "बढ़त",
+        "इज़ाफ़ा",
+        "इजाफा",
+        "उछाल"
+      ],
+      "note": "N% की वृद्धि हुई"
+    },
+    {
+      "role": "FALL_NOUN",
+      "lang": "hi",
+      "position": "noun",
+      "forms": [
+        "गिरावट",
+        "कमी",
+        "कटौती",
+        "घटाव",
+        "कमी आई"
+      ],
+      "note": "N% की गिरावट आई"
     },
     {
       "role": "RISE_PART",
@@ -459,6 +611,7 @@
     "not before X == after X and not after X == before X when the event time is a single point; the verifier treats these as equivalent only for inclusive-neutral dates and reports REWRITE_EQUIVALENT.",
     "GT, GTE, LT, LTE are never interchangeable; a change between them is reported as COMPARISON_CHANGED.",
     "की जगह is not a relation; ignore.",
-    "RISE_PART/FALL_PART give a direction hint only; C-DIR computes direction from the values. 'से बढ़कर' is GT unless a second Value follows (Participle disambiguation)."
+    "RISE_PART/FALL_PART give a direction hint only; C-DIR computes direction from the values. 'से बढ़कर' is GT unless a second Value follows (Participle disambiguation).",
+    "English rise/increase/fall/decrease/drop are listed once under RISE/FALL and may be a verb or a noun; the parser decides from context. Hindi nouns (वृद्धि, गिरावट) take the light verbs हुई/आई."
   ]
 }
