@@ -19,7 +19,8 @@ open, and the decisions made on the dev corpus.
 ## 2. Element merges
 | Id | Rule |
 |---|---|
-| E-DATE | `N MONTH`, `MONTH N`, `MONTH N, YEAR`, `N MONTH YEAR`, `MONTH YEAR` become one DATE (day 1 to 31, year 1900 to 2100). A day number after the month is taken only if the next word is a function word (`December 31 is`), so `In June 20 people came` keeps 20 as a quantity. Numeric dates (`15/10/2026`, `2026-10-15`) are day first unless a part is above 12 (flag `DATE_ORDER_ASSUMED`). |
+| E-DEC | Two numbers joined by one glued comma (`1,5`, `१,५`), both flagged `COMMA_DECIMAL_SUSPECT`, are one decimal (1.5), one clause; the flag stays on the value. |
+| E-DATE | `N MONTH`, `MONTH N`, `MONTH N, YEAR`, `N MONTH YEAR`, `MONTH YEAR` (the day may be an ordinal: `3rd March`, `March 3rd`, `3rd of March`) become one DATE (day 1 to 31, year 1900 to 2100). A day number after the month is taken only if the next word is a function word (`December 31 is`), so `In June 20 people came` keeps 20 as a quantity. Numeric dates (`15/10/2026`, `2026-10-15`) are day first unless a part is above 12 (flag `DATE_ORDER_ASSUMED`). |
 | E-DUR | A COUNT directly followed by a unit word of `lexicons/durations.json` (one or two words, an optional glued hyphen: `7-day`) is a DURATION. |
 | E-DAYPART | A part of the day directly before or after a TIME with no period gives it AM or PM (`शाम 5 बजे` = 5 PM, `रात 1 बजे` = 1 AM; flag `PERIOD_FROM_DAYPART`); directly after a weekday it becomes the DATE `daypart`. A bare part of the day states no fact. |
 

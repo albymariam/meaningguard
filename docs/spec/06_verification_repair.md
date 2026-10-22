@@ -1,9 +1,11 @@
 # 06 Verification and repair (v1)
 
 ## 1. Alignment
-Clauses are aligned by index when both sides have the same number of clauses. If the counts differ,
-the verifier aligns by fingerprints across the whole sentence and reports `CLAUSE_COUNT_CHANGED`
-(warning). Facts are then compared as multisets of fingerprints per aligned unit.
+Only clauses that say something count: a clause with no fact, no negation and no condition is
+ignored (it is also left out of the sentence fingerprint). Clauses are paired by equal fingerprint,
+then by conditional role, then by order, so a reordered conditional still aligns. A clause whose
+facts were all lost pairs with an empty clause of the other side. If clauses are still left over,
+the verifier reports `CLAUSE_COUNT_CHANGED` (warning) and compares the facts of the whole sentence.
 
 ## 2. Fact comparison
 For each source fact there are four outcomes:
@@ -26,7 +28,15 @@ currency, codes differ), `CURRENCY_MISSING` (source has one, target has none), `
 `TIMEREL_CHANGED`, `DATE_CHANGED`, `TIME_CHANGED`, `TIME_PERIOD_MISSING` (warning),
 `DATE_PRECISION_CHANGED` (warning), `PRECISION_CHANGED` (warning), `VAGUE_QUANTITY_CHANGED`,
 `NEGATION_DROPPED`, `NEGATION_ADDED`, `NEGATION_UNCERTAIN`, `CLAUSE_COUNT_CHANGED` (warning),
-`AMBIGUOUS_NUMBER` (warning), `UNVERIFIED` (info), `REPAIR_REVERTED`.
+`AMBIGUOUS_NUMBER` (warning), `UNVERIFIED` (info), `REPAIR_REVERTED`, `LITERAL_CHANGED` (a phone
+number, version or identifier differs), `CONDITION_CHANGED` (warning; the conditional role of a clause
+differs), `SOURCE_INCONSISTENT` (warning; the source verb contradicts its own numbers, the numbers win).
+A `CHANGE` whose target verb contradicts the target numbers (flag `SOURCE_INCONSISTENT` on the target)
+while the source is consistent is `DIRECTION_CHANGED`: the fingerprint holds the direction computed from
+the numbers, so the verb (`verb` field) is compared as well.
+Each finding keeps every difference of its fact pair in `diffs` (path, code, source value, target value),
+so repair can act on one field (`to` of a `CHANGE`, `high` of a `RANGE`). A finding is `unique` when
+its pair was the only leftover fact of its kind on both sides.
 When one source fact differs from one target fact in several ways, the most specific code wins in
 this order: `DIRECTION_CHANGED`, `CURRENCY_*`, `COMPARISON_CHANGED`, `NUMBER_CHANGED`.
 
@@ -34,8 +44,11 @@ this order: `DIRECTION_CHANGED`, `CURRENCY_*`, `COMPARISON_CHANGED`, `NUMBER_CHA
 - Tier 1 on both sides: findings are reported as is.
 - Tier 2 on either side: findings are reported, and `MISSING` becomes `UNVERIFIED` (info) because the
   parser may have skipped the fact.
-- Tier 3 on either side: only number, currency and clause-polarity checks run; every result carries
-  `confidence: low` and the UI label "basic check".
+- Tier 3 on either side: only number, currency and clause-polarity checks run (every numeric value of
+  every fact is compared); every result carries `confidence: low` and the UI label "basic check". A
+  source number missing from the translation is then `FACT_MISSING` as a warning, not an error, because the
+  translation may hold it in a form the parser cannot read.
+- Equal values written with different ambiguous notations (`1.500` and `१,५`) give `AMBIGUOUS_NUMBER`.
 - Lexer flags `COMMA_DECIMAL_SUSPECT`, `DOT_THOUSANDS_SUSPECT`, `MIXED_DIGIT_SCRIPT` on a number
   downgrade its `CHANGED` to `AMBIGUOUS_NUMBER` (warning) and block repair for that fact.
 
@@ -52,14 +65,18 @@ Tone findings never block or trigger repair.
 Repair edits only the target text, only for these findings, and only when all preconditions hold.
 | Finding | Edit | Preconditions |
 |---|---|---|
-| `NUMBER_CHANGED` (MONEY, COUNT, PERCENT) | replace the target's number span with the source's value in the target's own notation (Indian grouping, lakh/crore, Devanagari digits if the target uses them) | exactly one source fact and one target fact of that kind and role; source tier 1; target tier 1 or 2; no number flags |
-| `CURRENCY_CHANGED` / `CURRENCY_MISSING` | replace or insert the currency token | same as above |
+| `NUMBER_CHANGED` (MONEY, COUNT, PERCENT) | replace the target's number span with the source's value in the target's own notation (Indian grouping, lakh/crore, Devanagari digits if the target uses them) | the finding is `unique` (one leftover source fact and one leftover target fact of that kind and role); source tier 1; target tier 1 or 2; no number flags |
+| `NUMBER_CHANGED` (DURATION amount, same unit) | same, the unit word is kept | same as above |
+| `CURRENCY_CHANGED` / `CURRENCY_MISSING` | replace or insert the currency token (symbol if the target uses symbols, else the Hindi word) | same as above |
 | `NEGATION_DROPPED` | none (reported only) | negation insertion needs verb morphology and is out of scope |
 | everything else | none | |
 
-After an edit the pipeline re-parses the repaired text and re-verifies:
+The number is written with the target's own digit script, scale word (a scale that no longer fits is
+replaced by the largest one that gives at most two decimals) and grouping (Indian for INR, otherwise
+copied from the target). The edits of one finding form one group; groups are applied from the end of the
+text backwards. After an edit group the pipeline re-parses the repaired text and re-verifies:
 1. The targeted finding must be gone.
-2. No new `CHANGED` or `MISSING` finding may appear.
+2. No new finding of severity warning or error may appear.
 3. Every fact that matched before still matches.
 4. Otherwise the edit is discarded and the finding reported unrepaired (`REPAIR_REVERTED`).
 Repair is idempotent: running it on its own output makes no further edit. At most one repair pass

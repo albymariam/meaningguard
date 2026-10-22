@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from meaningguard.ir import compile_text  # noqa: E402
+from meaningguard.verifier import verify  # noqa: E402
 
 
 def load(path):
@@ -54,6 +55,9 @@ def main():
     ap.add_argument("--split", default="dev", choices=["dev", "heldout", "all"])
     ap.add_argument("--i-know-this-spends-heldout", action="store_true")
     ap.add_argument("--all-rows", action="store_true")
+    ap.add_argument(
+        "--verify", action="store_true", help="print verifier findings instead of IR diffs"
+    )
     args = ap.parse_args()
     if args.split != "dev" and not args.i_know_this_spends_heldout:
         sys.exit("Refusing: held-out is used once, in Phase 9. Pass --i-know-this-spends-heldout.")
@@ -62,12 +66,21 @@ def main():
     sentences = {r["id"]: r for r in load(data / "sentences.jsonl")}
     translations = load(data / "translations.jsonl")
     match = diff = 0
+    status = {"pass": 0, "warn": 0, "fail": 0}
     for t in translations:
         row = sentences[t["id"]]
         if args.split != "all" and row["split"] != args.split:
             continue
         hi_text = t["hindi"]
         en, hi = compile_text(row["text"], "en"), compile_text(hi_text, "hi")
+        if args.verify:
+            report = verify(en, hi)
+            status[report.status] += 1
+            if report.status != "pass" or args.all_rows:
+                print(f"{report.status.upper():4} {t['id']} {row['text']}\n     {hi_text}")
+                for f in report.findings:
+                    print(f"     {f.severity:7} {f.code}: {f.message}")
+            continue
         ok = en.fp == hi.fp
         match += ok
         diff += not ok
@@ -85,6 +98,11 @@ def main():
                 if x not in a:
                     print("   + only HI:", x)
             print("   codes HI:", sorted(c for c in hi.codes() if c != "NON_QUANTITY"))
+    if args.verify:
+        print(
+            f"\n{status['pass']} pass, {status['warn']} warn, {status['fail']} fail ({args.split})"
+        )
+        return
     print(f"\n{match} match, {diff} differ ({args.split})")
 
 

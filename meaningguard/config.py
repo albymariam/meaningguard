@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +31,8 @@ class Runtime:
     num_beams: int
     max_length: int
     use_cache: bool = True
+    timeout_seconds: int = 60  # per translator in the fallback chain
+    google_fallback: bool = True  # deep-translator, no key; used only when IndicTrans2 fails
 
 
 @dataclass(frozen=True)
@@ -44,6 +46,7 @@ class Config:
     models: ModelIds
     runtime: Runtime
     languages: Languages
+    revisions: dict = field(default_factory=dict)  # model id -> pinned commit (tools/pin_models.py)
 
 
 def _section(raw: dict[str, Any], key: str) -> dict[str, Any]:
@@ -72,6 +75,16 @@ def _boolean(section: dict[str, Any], key: str, where: str, default: bool) -> bo
     if not isinstance(value, bool):
         raise ConfigError(f"{where}.{key} must be true or false")
     return value
+
+
+def _revisions(raw: dict[str, Any]) -> dict[str, str]:
+    value = raw.get("revisions") or {}
+    if not isinstance(value, dict):
+        raise ConfigError("revisions must be a mapping of model id to commit")
+    for model, commit in value.items():
+        if not isinstance(model, str) or not isinstance(commit, str) or not commit.strip():
+            raise ConfigError(f"revisions.{model} must be a non-empty string")
+    return {m: c.strip() for m, c in value.items()}
 
 
 def load_config(path: Path | str | None = None) -> Config:
@@ -107,9 +120,16 @@ def load_config(path: Path | str | None = None) -> Config:
             num_beams=_positive_int(runtime, "num_beams", "runtime"),
             max_length=_positive_int(runtime, "max_length", "runtime"),
             use_cache=_boolean(runtime, "use_cache", "runtime", default=True),
+            timeout_seconds=(
+                _positive_int(runtime, "timeout_seconds", "runtime")
+                if "timeout_seconds" in runtime
+                else 60
+            ),
+            google_fallback=_boolean(runtime, "google_fallback", "runtime", default=True),
         ),
         languages=Languages(
             source=_text(languages, "source", "languages"),
             target=_text(languages, "target", "languages"),
         ),
+        revisions=_revisions(raw),
     )

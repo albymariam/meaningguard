@@ -64,3 +64,28 @@ def test_close_forgets_the_model(monkeypatch):
     translator.close()
     translator.translate(["b"])
     assert state["loads"] == 2
+
+
+def test_pinned_revision_reaches_from_pretrained(monkeypatch):
+    import sys
+
+    seen = []
+
+    class Loader:
+        @staticmethod
+        def from_pretrained(model_id, **options):
+            seen.append((model_id, options))
+            return SimpleNamespace(to=lambda device: "model")
+
+    monkeypatch.setitem(
+        sys.modules, "IndicTransToolkit", SimpleNamespace(IndicProcessor=lambda **k: "p")
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "transformers",
+        SimpleNamespace(AutoTokenizer=Loader, AutoModelForSeq2SeqLM=Loader),
+    )
+    translator = Translator(load_config(), "m", "eng_Latn", "hin_Deva", "cpu", revision="abc123")
+    translator._load()
+    assert [o["revision"] for _, o in seen] == ["abc123", "abc123"]
+    assert all(o["trust_remote_code"] for _, o in seen)

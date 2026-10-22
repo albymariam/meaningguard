@@ -17,7 +17,9 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from dataclasses import dataclass, field
+from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
 
@@ -318,6 +320,9 @@ def build_elements(res: LexResult, nres: num.NumericResult) -> list:
     return els
 
 
+item_value = _item_value  # public name for repair
+
+
 def _opaque_el(t, base) -> El:
     kind = t.attrs["opaque"]
     digits = t.attrs.get("digits", "")
@@ -422,6 +427,42 @@ def merge_dates(els: list) -> list:
             i = probe + 1
         merged.value = Date(day=day, month=month, year=year)
         out.append(merged)
+    return out
+
+
+def merge_decimal_commas(els: list) -> list:
+    """``1,5`` and ``१,५`` (digits, one glued comma, digits, both flagged COMMA_DECIMAL_SUSPECT)
+    are one decimal number, not two numbers in two clauses. The flag stays on the value."""
+    out: list = []
+    i = 0
+    while i < len(els):
+        a = els[i]
+        comma = els[i + 1] if i + 1 < len(els) else None
+        b = els[i + 2] if i + 2 < len(els) else None
+        if (
+            _is_val(a, "COUNT")
+            and _is_val(b, "COUNT")
+            and comma is not None
+            and comma.kind == "PUNCT"
+            and comma.text == ","
+            and a.end == comma.start
+            and comma.end == b.start
+            and "COMMA_DECIMAL_SUSPECT" in a.flags
+            and "COMMA_DECIMAL_SUSPECT" in b.flags
+            and not a.attrs.get("scales")
+            and not b.attrs.get("scales")
+            and a.sentence == b.sentence
+        ):
+            tail = "".join(str(unicodedata.digit(c)) for c in b.text if c.isdigit())
+            if tail:
+                value = Count(a.value.amount + Decimal(tail) / (Decimal(10) ** len(tail)))
+                merged = _union(a, b, value)
+                merged.attrs = {"words": False, "scales": 0}
+                out.append(merged)
+                i += 3
+                continue
+        out.append(a)
+        i += 1
     return out
 
 
@@ -1252,7 +1293,9 @@ def parse(text: str, lang: str) -> tuple:
     if lang not in ("en", "hi"):
         raise ValueError(f"unsupported language {lang!r}")
     res, nres = num.analyze(text, lang)
-    els = merge_dayparts(merge_durations(merge_dates(build_elements(res, nres))))
+    els = merge_dayparts(
+        merge_durations(merge_dates(merge_decimal_commas(build_elements(res, nres))))
+    )
     if lang == "hi":
         els = _hindi_idioms(els)
     diagnostics: list = []

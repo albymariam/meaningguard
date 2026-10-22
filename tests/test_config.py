@@ -83,3 +83,26 @@ def test_missing_section(tmp_path):
 def test_invalid_values(tmp_path, old, new):
     with pytest.raises(ConfigError):
         load_config(write(tmp_path, VALID.replace(old, new)))
+
+
+def test_new_runtime_options_have_defaults_and_can_be_set(tmp_path):
+    cfg = load_config(write(tmp_path, VALID))
+    assert (cfg.runtime.timeout_seconds, cfg.runtime.google_fallback, cfg.revisions) == (
+        60,
+        True,
+        {},
+    )
+    more = VALID.replace(
+        "max_length: 256", "max_length: 256\n  timeout_seconds: 5\n  google_fallback: false"
+    )
+    cfg = load_config(write(tmp_path, more + "revisions:\n  a/en-indic: abc\n"))
+    assert (cfg.runtime.timeout_seconds, cfg.runtime.google_fallback) == (5, False)
+    assert cfg.revisions == {"a/en-indic": "abc"}
+
+
+@pytest.mark.parametrize(
+    "bad", ["revisions: [1]\n", "revisions:\n  a: ''\n", "revisions:\n  a: 5\n"]
+)
+def test_invalid_revisions(tmp_path, bad):
+    with pytest.raises(ConfigError):
+        load_config(write(tmp_path, VALID + bad))

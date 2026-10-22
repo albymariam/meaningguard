@@ -10,7 +10,12 @@ runtime:
   num_beams: 5
   max_length: 256
   use_cache: true     # set false if IndicTrans2 generate() fails with a key-value cache error
+  timeout_seconds: 60 # per translator before the next one in the chain is tried
+  google_fallback: true  # deep-translator (no key) when IndicTrans2 fails; false = IndicTrans2 only
 
 languages:
   source: eng_Latn
   target: hin_Deva
+
+# Pinned model commits: run `python tools/pin_models.py --write` once on a machine with internet.
+revisions: {}

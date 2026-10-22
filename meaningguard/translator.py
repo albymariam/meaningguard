@@ -1,6 +1,9 @@
-"""IndicTrans2 wrapper: loads a model once, translates in batches (pretrained, no training).
+"""IndicTrans2 wrapper (pretrained, no training) and the Google fallback.
 
-Phase 4 adds the fallback chain, caching and timeouts on top of this class.
+``Translator`` loads a model once and translates in batches. ``GoogleFallback`` is the unofficial
+Google endpoint through deep-translator: no key and no download, used only when IndicTrans2 fails.
+Both have ``name`` and ``translate(list[str]) -> list[str]``; ``pipeline.ChainTranslator``
+tries them in order.
 """
 
 from __future__ import annotations
@@ -18,15 +21,21 @@ class Translator:
     tgt: str
     device: str = "cpu"
     batch_size: int = 8
+    revision: str | None = None  # pinned commit of the model, from config.revisions
     _loaded: tuple | None = field(default=None, init=False, repr=False)
+
+    @property
+    def name(self) -> str:
+        return self.model_id
 
     def _load(self) -> tuple:
         from IndicTransToolkit import IndicProcessor
         from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
         processor = IndicProcessor(inference=True)
-        tokenizer = AutoTokenizer.from_pretrained(self.model_id, trust_remote_code=True)
-        model = AutoModelForSeq2SeqLM.from_pretrained(self.model_id, trust_remote_code=True)
+        options = {"trust_remote_code": True, "revision": self.revision}
+        tokenizer = AutoTokenizer.from_pretrained(self.model_id, **options)
+        model = AutoModelForSeq2SeqLM.from_pretrained(self.model_id, **options)
         return processor, tokenizer, model.to(self.device)
 
     def _ensure_loaded(self) -> tuple:
@@ -74,3 +83,42 @@ class Translator:
         import gc
 
         gc.collect()
+
+
+@dataclass
+class GoogleFallback:
+    """deep-translator's Google endpoint, rate limited, so a failure is retried with backoff."""
+
+    source: str = "en"
+    target: str = "hi"
+    attempts: int = 3
+    first_wait: float = 1.0
+
+    @property
+    def name(self) -> str:
+        return "google (deep-translator)"
+
+    def translate(self, sentences: list[str]) -> list[str]:
+        import time
+
+        from deep_translator import GoogleTranslator
+
+        client = GoogleTranslator(source=self.source, target=self.target)
+        out: list[str] = []
+        for sentence in sentences:
+            wait, last = self.first_wait, None
+            for attempt in range(1, self.attempts + 1):
+                try:
+                    out.append(client.translate(sentence))
+                    break
+                except Exception as exc:  # noqa: BLE001 - network and rate-limit errors vary
+                    last = exc
+                    if attempt < self.attempts:
+                        time.sleep(wait)
+                        wait *= 2
+            else:
+                raise RuntimeError(f"Google translation failed: {type(last).__name__}: {last}")
+        return out
+
+    def close(self) -> None:
+        return None

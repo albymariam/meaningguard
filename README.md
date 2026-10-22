@@ -40,3 +40,14 @@ create a read token, and set it. Never commit it.
 
     pytest -q
     ruff check .
+
+## Use
+
+    from meaningguard.pipeline import build_pipeline
+    result = build_pipeline().check("Pay ₹5 lakh by Friday.")     # translate, verify, repair
+    result.final, result.report.status, result.report.codes()
+    build_pipeline().check("Pay ₹5 lakh.", "५० लाख रुपये दें।")   # check a translation you already have
+
+IndicTrans2 is tried first, then the Google fallback (`runtime.google_fallback` in `config.yaml`).
+Pin the model versions once with `python tools/pin_models.py --write`.
+Dev check on real translations: `python tools/compare_translations.py --verify`.
