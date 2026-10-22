@@ -57,15 +57,18 @@ ChangeVerb    = RISE | FALL ;
    रुपये/रुपए (currency lexicon) instead of the ₹ sign. The direction word is only a hint:
    C-DIR recomputes it from the values and flags SOURCE_INCONSISTENT on a mismatch. *)
 ChangeParticiple = [ Value , "से" ] , ( RISE_PART | FALL_PART ) , Value , [ CHANGE_COPULA ] ;
-BoundFact     = Value , ( GT | LT )                                           -> Bound(op, v)    (* ₹५०० से ज़्यादा *)
+BoundFact     = Value , ( GT | LT | GTE_POST | LTE_POST )                    -> Bound(op, v)    (* ₹५०० से ज़्यादा, ₹५०० या ज़्यादा *)
+              | Value , "तक"                                                   -> Bound(LTE, v)   (* up to; not after a Duration *)
               | ( GTE | LTE ) , Value                                          (* कम से कम ₹५०० *)
               | Value , ( GTE | LTE ) ;                                        (* ₹५०० अधिकतम is rare; accepted *)
 
 (* ---- time ---- *)
 TimeFact      = Anchor , TimeRelPost                                          -> TimeRel(rel, anchor)
 TimeRelPost   = TIME_BEFORE | TIME_AFTER | "तक" | TIME_ON | TIME_WITHIN ;
+(* NEG after a bound or time phrase may be followed by a copula (है, होगा, होनी चाहिए) and still scope over the phrase. *)
 Anchor        = TIME_LITERAL | DAY | Date | DayPart ;
 Date          = [ NUMBER ] , MONTH , [ NUMBER ] ;
+Duration      = Count , UnitWord ;           (* 10 दिनों, 3 कार्य दिवस; "में" after a Duration is WITHIN, after a Date or Time it is ON *)
 (* "को" and "पर" are TIME_ON only directly after an Anchor; otherwise they are case markers and are skipped.
    "तक" after an Anchor is ON_OR_BEFORE (BY_UNTIL_AMBIGUOUS). "तक" after a Value is the closing particle of RangeFact. *)
 

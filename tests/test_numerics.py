@@ -16,11 +16,38 @@ LEX = Path(__file__).resolve().parent.parent / "meaningguard" / "lexicons"
 HI = json.loads((LEX / "numbers_hi.json").read_text(encoding="utf-8"))["numbers"]
 HI_WORD = {int(v): forms[0] for v, forms in HI.items()}
 
-EN_UNITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
-            "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
-            "eighteen", "nineteen"]
-EN_TENS = {20: "twenty", 30: "thirty", 40: "forty", 50: "fifty", 60: "sixty", 70: "seventy",
-           80: "eighty", 90: "ninety"}
+EN_UNITS = [
+    "zero",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+]
+EN_TENS = {
+    20: "twenty",
+    30: "thirty",
+    40: "forty",
+    50: "fifty",
+    60: "sixty",
+    70: "seventy",
+    80: "eighty",
+    90: "ninety",
+}
 
 
 def en_under_100(n, hyphen):
@@ -130,19 +157,42 @@ def test_hindi_fraction_words_match_oracle(n, scale):
         assert Fraction(single_value(phrase)) == eval_hindi(phrase)
 
 
-@pytest.mark.parametrize("phrase", [
-    "सवा लाख", "सवा सौ", "सवा तीन", "सवा दो सौ", "साढ़े तीन सौ", "साढ़े चार लाख", "पौने चार",
-    "पौने दो सौ", "पौने चार सौ", "डेढ़ करोड़", "ढाई हज़ार", "डेढ़", "दो करोड़ पचास लाख",
-    "पाँच सौ पाँच", "निन्यानवे",
-])
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "सवा लाख",
+        "सवा सौ",
+        "सवा तीन",
+        "सवा दो सौ",
+        "साढ़े तीन सौ",
+        "साढ़े चार लाख",
+        "पौने चार",
+        "पौने दो सौ",
+        "पौने चार सौ",
+        "डेढ़ करोड़",
+        "ढाई हज़ार",
+        "डेढ़",
+        "दो करोड़ पचास लाख",
+        "पाँच सौ पाँच",
+        "निन्यानवे",
+    ],
+)
 def test_hindi_phrases_match_oracle(phrase):
     assert Fraction(single_value(phrase)) == eval_hindi(phrase)
 
 
-@pytest.mark.parametrize("phrase", [
-    "twenty-five", "five hundred and five", "one hundred and five", "half a million",
-    "a quarter of a crore", "two crore fifty lakh", "a hundred",
-])
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "twenty-five",
+        "five hundred and five",
+        "one hundred and five",
+        "half a million",
+        "a quarter of a crore",
+        "two crore fifty lakh",
+        "a hundred",
+    ],
+)
 def test_english_phrases_match_oracle(phrase):
     assert Fraction(single_value(phrase)) == eval_english(phrase)
 
@@ -177,18 +227,31 @@ TABLE = [
     ("पाँच हज़ार दो सौ", [("5200", "COUNT", None)]),
     ("डेढ़ सौ रुपये", [("150", "MONEY", "INR")]),
     ("आधा लाख", [("50000", "COUNT", None)]),
-    ("50% off, 12.5 per cent, ५ प्रतिशत",
-     [("50", "PERCENT", None), ("12.5", "PERCENT", None), ("5", "PERCENT", None)]),
-    ("from -5 to -10 and 5-10", [("-5", "COUNT", None), ("-10", "COUNT", None),
-                                  ("5", "COUNT", None), ("10", "COUNT", None)]),
+    (
+        "50% off, 12.5 per cent, ५ प्रतिशत",
+        [("50", "PERCENT", None), ("12.5", "PERCENT", None), ("5", "PERCENT", None)],
+    ),
+    (
+        "from -5 to -10 and 5-10",
+        [
+            ("-5", "COUNT", None),
+            ("-10", "COUNT", None),
+            ("5", "COUNT", None),
+            ("10", "COUNT", None),
+        ],
+    ),
     ("Take .5 kg", [("0.5", "COUNT", None)]),
     ("दो-तीन लोग", [("2", "COUNT", None), ("3", "COUNT", None)]),
     ("5km and 10kg", [("5", "COUNT", None), ("10", "COUNT", None)]),
     ("कीमत ₹५००-₹६०० है", [("500", "MONEY", "INR"), ("600", "MONEY", "INR")]),
-    ("कीमत 500 रुपये से गिरकर 400 रुपये हो गई, इसलिए शुक्रवार के बाद भुगतान न करें।",
-     [("500", "MONEY", "INR"), ("400", "MONEY", "INR")]),
-    ("The price fell from Rs. 500 to Rs. 400, so do not pay after Friday.",
-     [("500", "MONEY", "INR"), ("400", "MONEY", "INR")]),
+    (
+        "कीमत 500 रुपये से गिरकर 400 रुपये हो गई, इसलिए शुक्रवार के बाद भुगतान न करें।",
+        [("500", "MONEY", "INR"), ("400", "MONEY", "INR")],
+    ),
+    (
+        "The price fell from Rs. 500 to Rs. 400, so do not pay after Friday.",
+        [("500", "MONEY", "INR"), ("400", "MONEY", "INR")],
+    ),
 ]
 
 
@@ -200,22 +263,39 @@ def test_edge_case_table(text, expected):
     assert not numeric.errors
 
 
-@pytest.mark.parametrize("text", [
-    "I have 3 crore 5 crore", "5 lakh 2 crore", "दो लाख तीन करोड़", "two thousand three million",
-])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "I have 3 crore 5 crore",
+        "5 lakh 2 crore",
+        "दो लाख तीन करोड़",
+        "two thousand three million",
+    ],
+)
 def test_scale_order_errors_yield_no_quantity(text):
     _, numeric = analyze(text)
     assert [e.code for e in numeric.errors] == ["SCALE_ORDER"]
     assert numeric.quantities == []
 
 
-@pytest.mark.parametrize("text,hour,minute,period", [
-    ("साढ़े पाँच बजे", 5, 30, None), ("सवा चार बजे", 4, 15, None), ("पौने छह बजे", 5, 45, None),
-    ("डेढ़ बजे", 1, 30, None), ("ढाई बजे", 2, 30, None), ("5 pm", 5, 0, "PM"),
-    ("10AM", 10, 0, "AM"), ("10:30 AM", 10, 30, "AM"), ("18:30", 18, 30, None),
-    ("५ बजे", 5, 0, None), ("पाँच बजे", 5, 0, None), ("at 5 o'clock", 5, 0, None),
-    ("पौने एक बजे", 12, 45, None),
-])
+@pytest.mark.parametrize(
+    "text,hour,minute,period",
+    [
+        ("साढ़े पाँच बजे", 5, 30, None),
+        ("सवा चार बजे", 4, 15, None),
+        ("पौने छह बजे", 5, 45, None),
+        ("डेढ़ बजे", 1, 30, None),
+        ("ढाई बजे", 2, 30, None),
+        ("5 pm", 5, 0, "PM"),
+        ("10AM", 10, 0, "AM"),
+        ("10:30 AM", 10, 30, "AM"),
+        ("18:30", 18, 30, None),
+        ("५ बजे", 5, 0, None),
+        ("पाँच बजे", 5, 0, None),
+        ("at 5 o'clock", 5, 0, None),
+        ("पौने एक बजे", 12, 45, None),
+    ],
+)
 def test_times(text, hour, minute, period):
     _, numeric = analyze(text)
     assert numeric.quantities == []
@@ -228,14 +308,17 @@ def test_invalid_times_stay_quantities(text):
     assert numeric.times == [] and len(numeric.quantities) == 1
 
 
-@pytest.mark.parametrize("text,flag", [
-    ("मेरे पास एक कार है।", "WEAK_ONE"),
-    ("I have one ticket.", "WEAK_ONE"),
-    ("मुझे पैसे दो।", "AMBIGUOUS_NUMWORD"),
-    ("half price", "FRACTION_WORD"),
-    ("5 pounds", "AMBIGUOUS_CURRENCY"),
-    ("lakh rupees", "BARE_SCALE"),
-])
+@pytest.mark.parametrize(
+    "text,flag",
+    [
+        ("मेरे पास एक कार है।", "WEAK_ONE"),
+        ("I have one ticket.", "WEAK_ONE"),
+        ("मुझे पैसे दो।", "AMBIGUOUS_NUMWORD"),
+        ("half price", "FRACTION_WORD"),
+        ("5 pounds", "AMBIGUOUS_CURRENCY"),
+        ("lakh rupees", "BARE_SCALE"),
+    ],
+)
 def test_quantity_flags(text, flag):
     _, numeric = analyze(text)
     assert any(flag in q.flags for q in numeric.quantities), text

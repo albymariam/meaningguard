@@ -125,7 +125,8 @@
         "surges",
         "go up",
         "goes up",
-        "going up"
+        "going up",
+        "up"
       ]
     },
     {
@@ -159,7 +160,8 @@
         "plunges",
         "go down",
         "goes down",
-        "going down"
+        "going down",
+        "down"
       ]
     },
     {
@@ -603,6 +605,58 @@
         "के भीतर",
         "के अंदर",
         "में"
+      ]
+    },
+    {
+      "role": "GTE",
+      "lang": "en",
+      "position": "post",
+      "forms": [
+        "or more",
+        "or above",
+        "or higher",
+        "or greater"
+      ]
+    },
+    {
+      "role": "LTE",
+      "lang": "en",
+      "position": "post",
+      "forms": [
+        "or less",
+        "or fewer",
+        "or below",
+        "or lower"
+      ]
+    },
+    {
+      "role": "TIME_SINCE",
+      "lang": "en",
+      "position": "pre",
+      "forms": [
+        "since"
+      ]
+    },
+    {
+      "role": "GTE",
+      "lang": "hi",
+      "position": "post",
+      "forms": [
+        "या ज़्यादा",
+        "या ज्यादा",
+        "या अधिक",
+        "या उससे ज़्यादा",
+        "या उससे ज्यादा",
+        "या उससे अधिक"
+      ]
+    },
+    {
+      "role": "LTE",
+      "lang": "hi",
+      "position": "post",
+      "forms": [
+        "या कम",
+        "या उससे कम"
       ]
     }
   ],

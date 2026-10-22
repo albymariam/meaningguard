@@ -39,8 +39,10 @@ def test_token_offsets_point_into_the_original_text():
     assert original[number.orig[0] : number.orig[1]] == "500"
 
 
-@pytest.mark.parametrize("text,exc", [("", EmptyInput), ("   \t\n", EmptyInput),
-                                      ("​‌", EmptyInput), ("a" * 1001, InputTooLong)])
+@pytest.mark.parametrize(
+    "text,exc",
+    [("", EmptyInput), ("   \t\n", EmptyInput), ("​‌", EmptyInput), ("a" * 1001, InputTooLong)],
+)
 def test_input_contract(text, exc):
     with pytest.raises(exc):
         lex(text)
@@ -51,14 +53,26 @@ def test_exactly_1000_characters_is_accepted():
 
 
 # -- sentences -------------------------------------------------------------------------------
-@pytest.mark.parametrize("text,count", [
-    ("Pay now.", 1), ("Pay now. Then leave.", 2), ("Rs. 500 is due. Pay now.", 2),
-    ("Mr. Rao paid. He left.", 2), ("See No. 5. It is open.", 2), ("I said no. Then left.", 2),
-    ("It costs 2.5 lakh. Pay.", 2), ("Wait... what?", 1), ("What?! Really?", 2),
-    ("पैसे दो। जल्दी करो॥", 2), ("He said \"pay now.\" Then left.", 2),
-    ("About 5 pm. 5 people came.", 2), ("approx. 5 people came.", 1),
-    ("Pay A. Rao.", 1), ("pay now", 1),
-])
+@pytest.mark.parametrize(
+    "text,count",
+    [
+        ("Pay now.", 1),
+        ("Pay now. Then leave.", 2),
+        ("Rs. 500 is due. Pay now.", 2),
+        ("Mr. Rao paid. He left.", 2),
+        ("See No. 5. It is open.", 2),
+        ("I said no. Then left.", 2),
+        ("It costs 2.5 lakh. Pay.", 2),
+        ("Wait... what?", 1),
+        ("What?! Really?", 2),
+        ("पैसे दो। जल्दी करो॥", 2),
+        ('He said "pay now." Then left.', 2),
+        ("About 5 pm. 5 people came.", 2),
+        ("approx. 5 people came.", 1),
+        ("Pay A. Rao.", 1),
+        ("pay now", 1),
+    ],
+)
 def test_sentence_count(text, count):
     assert lex(text).sentence_count == count
 
@@ -117,11 +131,22 @@ def test_latin_script_hindi_is_not_supported():
 
 
 # -- numbers that are not quantities ---------------------------------------------------------
-@pytest.mark.parametrize("text", [
-    "Call 9876543210 today.", "Call +91 98765 43210 now.", "Version 1.2.3 is out.",
-    "Due on 15/10/2026.", "Due 2026-10-22.", "Room A5 is free.", "Use H2O.", "COVID-19 cases.",
-    "The 1st and 22nd prize.", "५वीं मंज़िल पर।", "See item No. 5 now.",
-])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Call 9876543210 today.",
+        "Call +91 98765 43210 now.",
+        "Version 1.2.3 is out.",
+        "Due on 15/10/2026.",
+        "Due 2026-10-22.",
+        "Room A5 is free.",
+        "Use H2O.",
+        "COVID-19 cases.",
+        "The 1st and 22nd prize.",
+        "५वीं मंज़िल पर।",
+        "See item No. 5 now.",
+    ],
+)
 def test_non_quantities_have_no_number_token(text):
     result = lex(text)
     assert not result.of_type("NUMBER"), result.tokens
@@ -133,10 +158,16 @@ def test_opaque_tokens_keep_their_ascii_digits():
     assert token.attrs["digits"] == "9876543210"
 
 
-@pytest.mark.parametrize("text,flag", [
-    ("12,34", "COMMA_DECIMAL_SUSPECT"), ("1.500", "DOT_THOUSANDS_SUSPECT"),
-    ("१२3", "MIXED_DIGIT_SCRIPT"), ("5L", "AMBIGUOUS_ABBREV"), ("5m", "AMBIGUOUS_ABBREV"),
-])
+@pytest.mark.parametrize(
+    "text,flag",
+    [
+        ("12,34", "COMMA_DECIMAL_SUSPECT"),
+        ("1.500", "DOT_THOUSANDS_SUSPECT"),
+        ("१२3", "MIXED_DIGIT_SCRIPT"),
+        ("5L", "AMBIGUOUS_ABBREV"),
+        ("5m", "AMBIGUOUS_ABBREV"),
+    ],
+)
 def test_number_flags(text, flag):
     assert flag in lex(text).flags
 
@@ -166,18 +197,32 @@ def test_bare_scale_words_that_need_a_number_become_plain_words():
 
 
 # -- calendar words --------------------------------------------------------------------------
-@pytest.mark.parametrize("text,date_word", [
-    ("He may come in May.", "May"), ("Meet on May 5", "May"), ("Pay by may", "may"),
-    ("Meet on Sat", "Sat"), ("Pay Mar 5", "Mar"), ("in march", "march"),
-])
+@pytest.mark.parametrize(
+    "text,date_word",
+    [
+        ("He may come in May.", "May"),
+        ("Meet on May 5", "May"),
+        ("Pay by may", "may"),
+        ("Meet on Sat", "Sat"),
+        ("Pay Mar 5", "Mar"),
+        ("in march", "march"),
+    ],
+)
 def test_ambiguous_date_words_that_are_dates(text, date_word):
     assert any(t.type in ("DAY", "MONTH") and t.text == date_word for t in lex(text).tokens)
 
 
-@pytest.mark.parametrize("text", [
-    "He may come.", "I sat down.", "May I come?", "The sun is hot.", "They march on.",
-    "Sat on the chair.",
-])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "He may come.",
+        "I sat down.",
+        "May I come?",
+        "The sun is hot.",
+        "They march on.",
+        "Sat on the chair.",
+    ],
+)
 def test_ambiguous_date_words_that_are_not_dates(text):
     assert not lex(text).of_type("DAY", "MONTH")
 
@@ -188,13 +233,20 @@ def test_hindi_calendar_words():
 
 
 # -- negation roles --------------------------------------------------------------------------
-@pytest.mark.parametrize("text,role", [
-    ("Not only the price rose.", "NOT_ONLY"), ("No matter what.", "CONCESSIVE"),
-    ("No doubt it rose.", "EMPHASIS"), ("यह ठीक है न?", "TAG_QUESTION"),
-    ("वे ठीक हैं न", "TAG_QUESTION"), ("क्यों न जाएँ?", "SUGGESTION"),
-    ("Why not go?", "SUGGESTION"), ("कहीं न कहीं यह सही है।", "EMPHASIS"),
-    ("चलो ना, चलते हैं।", "AMBIG"),
-])
+@pytest.mark.parametrize(
+    "text,role",
+    [
+        ("Not only the price rose.", "NOT_ONLY"),
+        ("No matter what.", "CONCESSIVE"),
+        ("No doubt it rose.", "EMPHASIS"),
+        ("यह ठीक है न?", "TAG_QUESTION"),
+        ("वे ठीक हैं न", "TAG_QUESTION"),
+        ("क्यों न जाएँ?", "SUGGESTION"),
+        ("Why not go?", "SUGGESTION"),
+        ("कहीं न कहीं यह सही है।", "EMPHASIS"),
+        ("चलो ना, चलते हैं।", "AMBIG"),
+    ],
+)
 def test_non_counting_negators_have_a_role(text, role):
     result = lex(text)
     assert result.neg_count == 0
@@ -205,11 +257,18 @@ def test_tag_question_needs_sentence_end():
     assert lex("यह ठीक है न करो।").neg_count == 1
 
 
-@pytest.mark.parametrize("text,count", [
-    ("He did not come, nor did she.", 1), ("Neither he nor she came.", 1),
-    ("वह न आया न गया।", 1), ("I can't not go.", 2), ("No one has nothing.", 2),
-    ("It is not bad, not at all.", 2), ("Don't never do that.", 2),
-])
+@pytest.mark.parametrize(
+    "text,count",
+    [
+        ("He did not come, nor did she.", 1),
+        ("Neither he nor she came.", 1),
+        ("वह न आया न गया।", 1),
+        ("I can't not go.", 2),
+        ("No one has nothing.", 2),
+        ("It is not bad, not at all.", 2),
+        ("Don't never do that.", 2),
+    ],
+)
 def test_negation_counting(text, count):
     assert lex(text).neg_count == count
 

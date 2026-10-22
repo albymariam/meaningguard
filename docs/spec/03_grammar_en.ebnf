@@ -29,19 +29,25 @@ Magnitude     = NUMBER | NUMWORD , { NUMWORD | "and" , NUMWORD } ;
 (* ---- comparisons ---- *)
 ChangeFact    = [ Subject ] , ( RISE | FALL ) , ChangeOperand                -> Change(dir, from, to, delta)
 ChangeOperand = FROM , Value , TO , Value
-              | TO , Value
-              | "by" , Value
+              | TO , Value , [ FROM , Value ]                             (* climbed to 8% from 6% *)
+              | ( "by" | "of" ) , Value
+              | Value                                                      (* rose 12% *)
               | FROM , Value ;
+(* Also: Value , ( RISE | FALL | RISE_NOUN | FALL_NOUN )                   a 12% rise  -> Change(dir, delta)
+   A bare past-tense verb with no operand is Change(dir) with no values (07 section 4). A RISE/FALL word
+   directly before a bound word (falls below 400) is dropped and the bound is parsed. *)
 Subject       = { WORD } ;                      (* kept as opaque text, never compared *)
 RangeFact     = BETWEEN , Value , RANGE_AND , Value                           -> Range(lo, hi)
               | FROM , Value , TO , Value
               | Value , ( TO | "-" ) , Value ;
 BoundFact     = ( GT | GTE | LT | LTE ) , Value                               -> Bound(op, v)
+              | Value , ( GTE_POST | LTE_POST ) ;                              (* 75% or more, 10 or fewer *)
 
 (* ---- time ---- *)
 TimeFact      = TimeRel , Anchor                                              -> TimeRel(rel, anchor)
-TimeRel       = TIME_BEFORE | TIME_AFTER | TIME_BY | TIME_UNTIL | TIME_ON | TIME_WITHIN ;
-Anchor        = TIME_LITERAL | DAY | Date | DayPart ;
+TimeRel       = TIME_BEFORE | TIME_AFTER | TIME_BY | TIME_UNTIL | TIME_ON | TIME_WITHIN | TIME_SINCE ;
+Anchor        = TIME_LITERAL | DAY | Date | DayPart | Duration ;
+Duration      = Count , UnitWord ;                (* 7 days, 3 working days; durations.json *)
 Date          = [ NUMBER ] , MONTH , [ NUMBER ] | NUMBER , MONTH ;
 DayPart       = TIMEMARK ;
 

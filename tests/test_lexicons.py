@@ -8,7 +8,13 @@ import pytest
 
 LEX = Path(__file__).resolve().parent.parent / "meaningguard" / "lexicons"
 FILES = [
-    "negation", "currency", "scales", "relations", "calendar", "numbers_en", "numbers_hi",
+    "negation",
+    "currency",
+    "scales",
+    "relations",
+    "calendar",
+    "numbers_en",
+    "numbers_hi",
 ]
 NUKTA = "़"
 CHANDRABINDU = "ँ"

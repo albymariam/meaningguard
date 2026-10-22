@@ -56,8 +56,9 @@ def test_sentence_schema_and_uniqueness():
         assert set(row["gold"]) == {"quantities", "rels", "times", "dates", "vague"}
         assert all(REL.match(r) for r in row["gold"]["rels"]), row["id"]
         for q in row["gold"]["quantities"]:
-            assert q["type"] in {"COUNT", "MONEY", "PERCENT"}
+            assert q["type"] in {"COUNT", "MONEY", "PERCENT", "DURATION"}
             assert (q["currency"] is not None) == (q["type"] == "MONEY"), row["id"]
+            assert ("unit" in q) == (q["type"] == "DURATION"), row["id"]
         if row["emotion"] is not None:
             assert row["emotion"] in EMOTIONS
 
@@ -107,7 +108,11 @@ def test_emotion_and_sarcasm_labels():
 def test_lexer_finds_the_gold_quantities_on_dev(row):
     _, numeric = analyze(row["text"], "en")
     got = [(str(q.value), q.type, q.currency) for q in numeric.quantities]
-    want = [(q["value"], q["type"], q["currency"]) for q in row["gold"]["quantities"]]
+    # the lexer does not know durations: a DURATION is a COUNT plus a unit word at this level
+    want = [
+        (q["value"], "COUNT" if q["type"] == "DURATION" else q["type"], q["currency"])
+        for q in row["gold"]["quantities"]
+    ]
     assert got == want
     assert [t.text.casefold() for t in numeric.times] == [
         t.casefold() for t in row["gold"]["times"]

@@ -19,9 +19,12 @@ Date parts (the 12 in `12 November`) are in `gold.dates`, not `gold.quantities`.
 `emotion` uses the 7 labels of the emotion model; `sarcasm` is true/false. `annotation: proposed` means the
 label is my proposal and still needs two human labels (you and a second annotator) before it counts as gold.
 
+## Gold rules (decided in Phase 3b)
+- Durations (`within 7 days`) are `quantities` of type `DURATION` with a `unit`; `1 week` and `7 days` are different units.
+- `rels` ignores `TIMEREL:ON`: the gold lists it for `on Monday` but not for `at 6 PM`, so tests leave it out.
+- Gold was corrected on dev only (s037, s080, s091, s094, s151, s153, s163, s168, s169, s177, s187). Held-out was not read.
+
 ## Open questions
-- Durations (`within 7 days`, `after 30 days`) have no anchor type in the spec yet. The 3 sentences that use
-  them are in `timerel` and `combined`. Phase 3b will decide (likely `TIMEREL` with a COUNT duration).
 - Hindi in `corruptions.jsonl` is written by me and marked `hindi_review: pending` until a native speaker confirms it.
 
 ## Steps on your machine

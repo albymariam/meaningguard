@@ -184,7 +184,7 @@ def get_lexicon() -> Lexicon:
     cal = _load("calendar")
     for item in cal["weekdays"]:
         for lang in ("en", "hi"):
-            for form in item[lang]:
+            for form in item[lang] + item.get(f"{lang}_plural", []):
                 lex.add(_phrase(form, "DAY", id=item["id"], lang=lang,
                                 ambiguous=make_key(form) in AMBIGUOUS_DATE_WORDS))
     for item in cal["months"]:

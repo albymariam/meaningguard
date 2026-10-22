@@ -7,5 +7,3 @@ __pycache__/
 .env
 .streamlit/secrets.toml
 reports/model_check.json
-
-*:Zone.Identifier

@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "note": "Duration units for DURATION values (parser, not lexer). Canonical unit ids: SECOND MINUTE HOUR DAY WEEK MONTH YEAR. A COUNT directly followed by one of these words is a DURATION.",
+  "units": [
+    {
+      "unit": "SECOND",
+      "en": [
+        "second",
+        "seconds",
+        "sec",
+        "secs"
+      ],
+      "hi": [
+        "सेकंड",
+        "सेकेंड",
+        "सेकण्ड"
+      ]
+    },
+    {
+      "unit": "MINUTE",
+      "en": [
+        "minute",
+        "minutes",
+        "min",
+        "mins"
+      ],
+      "hi": [
+        "मिनट",
+        "मिनटों"
+      ]
+    },
+    {
+      "unit": "HOUR",
+      "en": [
+        "hour",
+        "hours",
+        "hr",
+        "hrs"
+      ],
+      "hi": [
+        "घंटा",
+        "घंटे",
+        "घंटों",
+        "घण्टे",
+        "घण्टा"
+      ]
+    },
+    {
+      "unit": "DAY",
+      "en": [
+        "day",
+        "days",
+        "working day",
+        "working days",
+        "business day",
+        "business days"
+      ],
+      "hi": [
+        "दिन",
+        "दिनों",
+        "कार्य दिवस",
+        "कार्यदिवस",
+        "कार्यदिवसों",
+        "कार्य दिवसों",
+        "दिवस"
+      ]
+    },
+    {
+      "unit": "WEEK",
+      "en": [
+        "week",
+        "weeks"
+      ],
+      "hi": [
+        "सप्ताह",
+        "सप्ताहों",
+        "हफ़्ता",
+        "हफ्ता",
+        "हफ़्ते",
+        "हफ्ते",
+        "हफ़्तों",
+        "हफ्तों"
+      ]
+    },
+    {
+      "unit": "MONTH",
+      "en": [
+        "month",
+        "months"
+      ],
+      "hi": [
+        "महीना",
+        "महीने",
+        "महीनों",
+        "माह",
+        "मास"
+      ]
+    },
+    {
+      "unit": "YEAR",
+      "en": [
+        "year",
+        "years",
+        "yr",
+        "yrs"
+      ],
+      "hi": [
+        "साल",
+        "सालों",
+        "वर्ष",
+        "वर्षों"
+      ]
+    }
+  ]
+}

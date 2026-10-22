@@ -1,37 +1,286 @@
 {
   "version": 1,
   "weekdays": [
-    {"id": 0, "en": ["monday", "mon"], "hi": ["सोमवार"]},
-    {"id": 1, "en": ["tuesday", "tue", "tues"], "hi": ["मंगलवार"]},
-    {"id": 2, "en": ["wednesday", "wed"], "hi": ["बुधवार"]},
-    {"id": 3, "en": ["thursday", "thu", "thur", "thurs"], "hi": ["गुरुवार", "बृहस्पतिवार", "वीरवार"]},
-    {"id": 4, "en": ["friday", "fri"], "hi": ["शुक्रवार"]},
-    {"id": 5, "en": ["saturday", "sat"], "hi": ["शनिवार"]},
-    {"id": 6, "en": ["sunday", "sun"], "hi": ["रविवार", "इतवार"]}
+    {
+      "id": 0,
+      "en": [
+        "monday",
+        "mon"
+      ],
+      "hi": [
+        "सोमवार"
+      ],
+      "en_plural": [
+        "mondays"
+      ],
+      "hi_plural": [
+        "सोमवारों"
+      ]
+    },
+    {
+      "id": 1,
+      "en": [
+        "tuesday",
+        "tue",
+        "tues"
+      ],
+      "hi": [
+        "मंगलवार"
+      ],
+      "en_plural": [
+        "tuesdays"
+      ],
+      "hi_plural": [
+        "मंगलवारों"
+      ]
+    },
+    {
+      "id": 2,
+      "en": [
+        "wednesday",
+        "wed"
+      ],
+      "hi": [
+        "बुधवार"
+      ],
+      "en_plural": [
+        "wednesdays"
+      ],
+      "hi_plural": [
+        "बुधवारों"
+      ]
+    },
+    {
+      "id": 3,
+      "en": [
+        "thursday",
+        "thu",
+        "thur",
+        "thurs"
+      ],
+      "hi": [
+        "गुरुवार",
+        "बृहस्पतिवार",
+        "वीरवार"
+      ],
+      "en_plural": [
+        "thursdays"
+      ],
+      "hi_plural": [
+        "गुरुवारों"
+      ]
+    },
+    {
+      "id": 4,
+      "en": [
+        "friday",
+        "fri"
+      ],
+      "hi": [
+        "शुक्रवार"
+      ],
+      "en_plural": [
+        "fridays"
+      ],
+      "hi_plural": [
+        "शुक्रवारों"
+      ]
+    },
+    {
+      "id": 5,
+      "en": [
+        "saturday",
+        "sat"
+      ],
+      "hi": [
+        "शनिवार"
+      ],
+      "en_plural": [
+        "saturdays"
+      ],
+      "hi_plural": [
+        "शनिवारों"
+      ]
+    },
+    {
+      "id": 6,
+      "en": [
+        "sunday",
+        "sun"
+      ],
+      "hi": [
+        "रविवार",
+        "इतवार"
+      ],
+      "en_plural": [
+        "sundays"
+      ],
+      "hi_plural": [
+        "रविवारों"
+      ]
+    }
   ],
   "months": [
-    {"id": 1, "en": ["january", "jan"], "hi": ["जनवरी"]},
-    {"id": 2, "en": ["february", "feb"], "hi": ["फ़रवरी", "फरवरी"]},
-    {"id": 3, "en": ["march", "mar"], "hi": ["मार्च"]},
-    {"id": 4, "en": ["april", "apr"], "hi": ["अप्रैल", "अप्रेल"]},
-    {"id": 5, "en": ["may"], "hi": ["मई"]},
-    {"id": 6, "en": ["june", "jun"], "hi": ["जून"]},
-    {"id": 7, "en": ["july", "jul"], "hi": ["जुलाई"]},
-    {"id": 8, "en": ["august", "aug"], "hi": ["अगस्त"]},
-    {"id": 9, "en": ["september", "sep", "sept"], "hi": ["सितंबर", "सितम्बर"]},
-    {"id": 10, "en": ["october", "oct"], "hi": ["अक्टूबर", "अक्तूबर"]},
-    {"id": 11, "en": ["november", "nov"], "hi": ["नवंबर", "नवम्बर"]},
-    {"id": 12, "en": ["december", "dec"], "hi": ["दिसंबर", "दिसम्बर"]}
+    {
+      "id": 1,
+      "en": [
+        "january",
+        "jan"
+      ],
+      "hi": [
+        "जनवरी"
+      ]
+    },
+    {
+      "id": 2,
+      "en": [
+        "february",
+        "feb"
+      ],
+      "hi": [
+        "फ़रवरी",
+        "फरवरी"
+      ]
+    },
+    {
+      "id": 3,
+      "en": [
+        "march",
+        "mar"
+      ],
+      "hi": [
+        "मार्च"
+      ]
+    },
+    {
+      "id": 4,
+      "en": [
+        "april",
+        "apr"
+      ],
+      "hi": [
+        "अप्रैल",
+        "अप्रेल"
+      ]
+    },
+    {
+      "id": 5,
+      "en": [
+        "may"
+      ],
+      "hi": [
+        "मई"
+      ]
+    },
+    {
+      "id": 6,
+      "en": [
+        "june",
+        "jun"
+      ],
+      "hi": [
+        "जून"
+      ]
+    },
+    {
+      "id": 7,
+      "en": [
+        "july",
+        "jul"
+      ],
+      "hi": [
+        "जुलाई"
+      ]
+    },
+    {
+      "id": 8,
+      "en": [
+        "august",
+        "aug"
+      ],
+      "hi": [
+        "अगस्त"
+      ]
+    },
+    {
+      "id": 9,
+      "en": [
+        "september",
+        "sep",
+        "sept"
+      ],
+      "hi": [
+        "सितंबर",
+        "सितम्बर"
+      ]
+    },
+    {
+      "id": 10,
+      "en": [
+        "october",
+        "oct"
+      ],
+      "hi": [
+        "अक्टूबर",
+        "अक्तूबर"
+      ]
+    },
+    {
+      "id": 11,
+      "en": [
+        "november",
+        "nov"
+      ],
+      "hi": [
+        "नवंबर",
+        "नवम्बर"
+      ]
+    },
+    {
+      "id": 12,
+      "en": [
+        "december",
+        "dec"
+      ],
+      "hi": [
+        "दिसंबर",
+        "दिसम्बर"
+      ]
+    }
   ],
   "time_markers": {
-    "am": ["am", "a.m.", "a.m"],
-    "pm": ["pm", "p.m.", "p.m"],
-    "oclock": ["o'clock", "बजे"],
+    "am": [
+      "am",
+      "a.m.",
+      "a.m"
+    ],
+    "pm": [
+      "pm",
+      "p.m.",
+      "p.m"
+    ],
+    "oclock": [
+      "o'clock",
+      "बजे"
+    ],
     "day_parts": {
-      "morning": ["morning", "सुबह", "सवेरे"],
-      "noon": ["noon", "दोपहर"],
-      "evening": ["evening", "शाम"],
-      "night": ["night", "रात"]
+      "morning": [
+        "morning",
+        "सुबह",
+        "सवेरे"
+      ],
+      "noon": [
+        "noon",
+        "दोपहर"
+      ],
+      "evening": [
+        "evening",
+        "शाम"
+      ],
+      "night": [
+        "night",
+        "रात"
+      ]
     }
   },
   "notes": [

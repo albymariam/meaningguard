@@ -9,7 +9,7 @@ runtime:
   device: auto        # auto | cpu | cuda
   num_beams: 5
   max_length: 256
-  use_cache: false     # set false if IndicTrans2 generate() fails with a key-value cache error
+  use_cache: true     # set false if IndicTrans2 generate() fails with a key-value cache error
 
 languages:
   source: eng_Latn
