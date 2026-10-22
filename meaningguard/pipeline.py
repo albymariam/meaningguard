@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from .config import Config, load_config
 from .ir import IR, compile_text
 from .repair import RepairResult, repair
+from .tone import ToneChecker, ToneResult, build_tone_checker
 from .verifier import Report
 
 DEVANAGARI = re.compile(r"[ऀ-ॿ]")
@@ -92,6 +93,7 @@ class Result:
     target_ir: IR  # of ``final``
     repair: RepairResult
     timings: dict = field(default_factory=dict)
+    tone: ToneResult | None = None  # None when the tone check is off
 
     @property
     def before(self) -> Report:
@@ -99,7 +101,12 @@ class Result:
 
     @property
     def report(self) -> Report:
-        return self.repair.after
+        """The fact check after repair, plus the (advisory) tone findings."""
+        after = self.repair.after
+        if self.tone is None or not self.tone.findings:
+            return after
+        findings = after.findings + self.tone.findings
+        return Report(findings, after.matched, after.source_tier, after.target_tier)
 
     def to_dict(self) -> dict:
         return {
@@ -113,14 +120,23 @@ class Result:
             "repair": self.repair.to_dict(),
             "source_ir": self.source_ir.to_dict(),
             "target_ir": self.target_ir.to_dict(),
+            "tone": self.tone.to_dict() if self.tone else None,
             "timings": self.timings,
         }
 
 
 class Pipeline:
-    def __init__(self, chain: ChainTranslator | None, do_repair: bool = True):
+    def __init__(
+        self,
+        chain: ChainTranslator | None,
+        do_repair: bool = True,
+        tone: ToneChecker | None = None,
+        tone_timeout: float | None = 180,
+    ):
         self.chain = chain
         self.do_repair = do_repair
+        self.tone = tone
+        self.tone_timeout = tone_timeout
 
     def check(self, source: str, translation: str | None = None) -> Result:
         """Raises ``EmptyInput`` / ``InputTooLong`` for a bad source and ``TranslationFailed`` when
@@ -141,6 +157,7 @@ class Pipeline:
         start = time.perf_counter()
         outcome = repair(source_ir, translation, apply=self.do_repair)
         timings["verify_repair_ms"] = _ms(start)
+        tone = self._tone(source_ir, outcome, timings)
         return Result(
             source=source_ir.text,
             translation=translation,
@@ -151,19 +168,42 @@ class Pipeline:
             target_ir=outcome.target,
             repair=outcome,
             timings=timings,
+            tone=tone,
         )
+
+    def _tone(self, source_ir: IR, outcome: RepairResult, timings: dict) -> ToneResult | None:
+        """Tone of the source and of the final text. Never raises: tone is advisory."""
+        if self.tone is None:
+            return None
+        start = time.perf_counter()
+        try:
+            tone = call_with_timeout(
+                lambda: self.tone.check(source_ir.text, outcome.text), self.tone_timeout
+            )
+        except Exception as exc:  # noqa: BLE001
+            tone = ToneResult(
+                None, None, [], [f"tone check failed: {type(exc).__name__}: {exc}"[:160]]
+            )
+        timings["tone_ms"] = _ms(start)
+        source_ir.emotion, outcome.target.emotion = tone.source, tone.target
+        return tone
 
     def close(self) -> None:
         if self.chain is not None:
             self.chain.close()
+        if self.tone is not None:
+            self.tone.close()
 
 
 def _ms(start: float) -> float:
     return round((time.perf_counter() - start) * 1000, 1)
 
 
-def build_pipeline(cfg: Config | None = None, device: str | None = None) -> Pipeline:
-    """IndicTrans2 first, then Google if the config allows it. Nothing is loaded until first use."""
+def build_pipeline(
+    cfg: Config | None = None, device: str | None = None, tone: bool = False
+) -> Pipeline:
+    """IndicTrans2 first, then Google if the config allows it. Nothing is loaded until first use.
+    ``tone=True`` adds the emotion and sarcasm check (spec 08)."""
     from .check_models import resolve_device
     from .translator import GoogleFallback, Translator
 
@@ -177,4 +217,5 @@ def build_pipeline(cfg: Config | None = None, device: str | None = None) -> Pipe
         revision=cfg.revisions.get(cfg.models.en_indic),
     )
     chain = [primary] + ([GoogleFallback()] if cfg.runtime.google_fallback else [])
-    return Pipeline(ChainTranslator(chain, cfg.runtime.timeout_seconds))
+    checker = build_tone_checker(cfg, device) if tone else None
+    return Pipeline(ChainTranslator(chain, cfg.runtime.timeout_seconds), tone=checker)

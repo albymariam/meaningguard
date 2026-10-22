@@ -3,6 +3,7 @@
     python tools/smoke_pipeline.py                  # IndicTrans2 and the Google fallback
     python tools/smoke_pipeline.py --skip-google    # no internet call to Google
     python tools/smoke_pipeline.py --device cpu
+    python tools/smoke_pipeline.py --tone           # also load the emotion models (spec 08)
 
 Writes reports/smoke_pipeline.json and exits non-zero if a check FAILs. The main checks use
 IndicTrans2 only, so a broken model shows up as FAIL instead of being hidden by the fallback.
@@ -135,10 +136,42 @@ def run_checks(pipeline: Pipeline, cfg, skip_google: bool) -> tuple:
     return checks, warm
 
 
+TONE_PAIRS = [
+    (
+        "I am furious that they cancelled my flight without telling me.",
+        "मैं बहुत नाराज़ हूँ कि उन्होंने मुझे बताए बिना मेरी उड़ान रद्द कर दी।",
+        "negative",
+    ),
+    ("We won the match, I am so happy!", "हमने मैच जीत लिया, मैं बहुत खुश हूँ!", "positive"),
+]
+
+
+def tone_checks(checker) -> list:
+    """Real emotion models on two clear sentences. A wrong tone is a WARN, not a bug."""
+    checks = []
+    for source, hindi, expected in TONE_PAIRS:
+
+        def run(source=source, hindi=hindi, expected=expected):
+            out = checker.check(source, hindi)
+            if out.source is None:
+                return FAIL, "; ".join(out.notes)
+            got = (out.source["sentiment"], out.target["sentiment"] if out.target else None)
+            detail = (
+                f"source {got[0]}, translation {got[1]}, findings {[f.code for f in out.findings]}"
+            )
+            if out.notes:
+                detail += f"; notes: {'; '.join(out.notes)}"
+            return (PASS if got[0] == expected and not out.notes else WARN), detail
+
+        checks.append(_timed(f"tone: {source[:34]}", run))
+    return checks
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", default=None, help="cpu or cuda (default: from config)")
     parser.add_argument("--skip-google", action="store_true")
+    parser.add_argument("--tone", action="store_true", help="also run the emotion models")
     parser.add_argument("--out", default=str(ROOT / "reports" / "smoke_pipeline.json"))
     args = parser.parse_args(argv)
 
@@ -148,6 +181,10 @@ def main(argv=None) -> int:
     primary = build_pipeline(cfg, device=args.device).chain.translators[0]
     pipeline = Pipeline(ChainTranslator([primary], cfg.runtime.timeout_seconds))
     checks, _ = run_checks(pipeline, cfg, args.skip_google)
+    if args.tone:
+        from meaningguard.tone import build_tone_checker
+
+        checks += tone_checks(build_tone_checker(cfg, args.device))
     for c in checks:
         print(f"{c.status.upper():5} {c.seconds:7.2f}s  {c.name}\n         {c.detail}")
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)

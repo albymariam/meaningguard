@@ -53,13 +53,18 @@ this order: `DIRECTION_CHANGED`, `CURRENCY_*`, `COMPARISON_CHANGED`, `NUMBER_CHA
   downgrade its `CHANGED` to `AMBIGUOUS_NUMBER` (warning) and block repair for that fact.
 
 ## 4. Tone comparison (uses the Emotion record)
+Run on the final text, after repair. First matching row wins; a source with `possible_sarcasm` only
+reaches the second row, because its surface sentiment is not its meaning.
 | Source | Target | Result |
 |---|---|---|
+| `possible_sarcasm` = true | sentiment `positive` | `SARCASM_POSSIBLY_LOST` (warning) |
 | `positive` | `negative` (or reverse) | `TONE_POLARITY_FLIPPED` (warning) |
-| `neutral` | `positive`/`negative` with confidence >= 0.7 | `TONE_INTENSIFIED` (info) |
-| `possible_sarcasm` = true | target sentiment `positive` | `SARCASM_POSSIBLY_LOST` (warning) |
-| either side `uncertain` | | `TONE_UNCERTAIN` (info); never a warning |
-Tone findings never block or trigger repair.
+| `neutral` | `positive`/`negative`, confidence >= 0.7 | `TONE_INTENSIFIED` (info) |
+| `positive`/`negative` | `neutral`, confidence >= 0.7 | `TONE_WEAKENED` (info) |
+| `positive`/`negative` | `uncertain` | `TONE_UNCERTAIN` (info) |
+| same sentiment | two different labels, neither `neutral`/`uncertain` | `EMOTION_CHANGED` (info) |
+Tone findings have `confidence: low`, no source or target fact, never count as `fail`, and never
+trigger repair. If either record is missing (models unavailable) there are no tone findings.
 
 ## 5. Repair
 Repair edits only the target text, only for these findings, and only when all preconditions hold.

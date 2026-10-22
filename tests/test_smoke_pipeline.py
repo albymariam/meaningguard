@@ -117,3 +117,25 @@ def test_pinned_models_pass_the_pin_check():
     pinned = replace(cfg, revisions={cfg.models.en_indic: "abc"})
     checks, _ = smoke.run_checks(Pipeline(ChainTranslator([Echo()], 5)), pinned, skip_google=True)
     assert statuses(checks)["model versions pinned"] == "pass"
+
+
+def test_tone_checks_grade_the_models():
+    from meaningguard.tone import ToneResult
+
+    class Checker:
+        def __init__(self, sentiment, notes=(), source_ok=True):
+            self.sentiment, self.notes, self.source_ok = sentiment, list(notes), source_ok
+
+        def check(self, source, target):
+            rec = {"sentiment": self.sentiment}
+            return ToneResult(rec if self.source_ok else None, rec, [], self.notes)
+
+    # the first sentence is negative, the second positive
+    assert [c.status for c in smoke.tone_checks(Checker("negative"))] == ["pass", "warn"]
+    assert [c.status for c in smoke.tone_checks(Checker("negative", ["no back"]))] == [
+        "warn",
+        "warn",
+    ]
+    assert {c.status for c in smoke.tone_checks(Checker("x", ["down"], source_ok=False))} == {
+        "fail"
+    }

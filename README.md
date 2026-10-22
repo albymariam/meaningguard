@@ -49,5 +49,6 @@ create a read token, and set it. Never commit it.
     build_pipeline().check("Pay ₹5 lakh.", "५० लाख रुपये दें।")   # check a translation you already have
 
 IndicTrans2 is tried first, then the Google fallback (`runtime.google_fallback` in `config.yaml`).
+Add `build_pipeline(tone=True)` for the emotion and sarcasm check (spec 08).
 Pin the model versions once with `python tools/pin_models.py --write`.
 Dev check on real translations: `python tools/compare_translations.py --verify`.

@@ -38,7 +38,22 @@ SEVERITY = {
     "SOURCE_INCONSISTENT": WARNING,
     "AMBIGUOUS_NUMBER": WARNING,
     "UNVERIFIED": INFO,
+    "TONE_POLARITY_FLIPPED": WARNING,
+    "SARCASM_POSSIBLY_LOST": WARNING,
+    "TONE_INTENSIFIED": INFO,
+    "TONE_WEAKENED": INFO,
+    "EMOTION_CHANGED": INFO,
+    "TONE_UNCERTAIN": INFO,
 }
+TONE_CODES = (
+    "TONE_POLARITY_FLIPPED",
+    "SARCASM_POSSIBLY_LOST",
+    "TONE_INTENSIFIED",
+    "TONE_WEAKENED",
+    "EMOTION_CHANGED",
+    "TONE_UNCERTAIN",
+)
+TONE_STRONG = 0.7  # confidence needed before a change between neutral and polar is reported
 
 # Most specific code first (spec 06 section 2); the first one present in a pair names the finding.
 PRECEDENCE = (
@@ -625,3 +640,47 @@ class _Run:
 def verify(source: IR, target: IR) -> Report:
     """Compare the IR of the source sentence with the IR of its translation."""
     return _Run(source, target).run()
+
+
+# ---------------------------------------------------------------------------------------------
+# Tone (spec 08): advisory only. These findings never fail a check and never trigger repair.
+
+
+def _tone(code: str, message: str) -> Finding:
+    return Finding(code, SEVERITY[code], message, confidence="low")
+
+
+def compare_tone(src: dict | None, tgt: dict | None) -> list:
+    """Tone findings for a pair of emotion records (``emotion.EmotionAnalyzer`` output)."""
+    if not src or not tgt:
+        return []
+    s, t = src["sentiment"], tgt["sentiment"]
+    polar = ("positive", "negative")
+    sarcastic = bool(src.get("possible_sarcasm"))
+    if sarcastic:
+        # Its surface sentiment is not its meaning: only the loss of the irony is checked.
+        if t == "positive":
+            return [
+                _tone(
+                    "SARCASM_POSSIBLY_LOST",
+                    "The source sounds sarcastic but the translation reads as sincerely positive.",
+                )
+            ]
+        return []
+    if s in polar and t in polar and s != t:
+        return [
+            _tone(
+                "TONE_POLARITY_FLIPPED",
+                f"The source reads {s} but the translation reads {t}.",
+            )
+        ]
+    if s == "neutral" and t in polar and tgt["confidence"] >= TONE_STRONG:
+        return [_tone("TONE_INTENSIFIED", f"The source is neutral but the translation reads {t}.")]
+    if s in polar and t == "neutral" and tgt["confidence"] >= TONE_STRONG:
+        return [_tone("TONE_WEAKENED", f"The source reads {s} but the translation reads neutral.")]
+    if s in polar and t == "uncertain":
+        return [_tone("TONE_UNCERTAIN", "The tone of the translation could not be determined.")]
+    a, b = src["label"], tgt["label"]
+    if s == t and a != b and "neutral" not in (a, b) and "uncertain" not in (a, b):
+        return [_tone("EMOTION_CHANGED", f"The emotion changes from {a} to {b}.")]
+    return []

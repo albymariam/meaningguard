@@ -42,11 +42,23 @@ class Languages:
 
 
 @dataclass(frozen=True)
+class EmotionSettings:
+    """Thresholds of the voting rule (spec 08). Tuned on dev labels only."""
+
+    min_prob: float = 0.4  # a signal below this abstains
+    label_prob: float = 0.5  # the emotion label needs at least this
+    irony_prob: float = 0.5  # sarcasm on the irony score alone
+    irony_low: float = 0.35  # sarcasm when the surface sentiment contradicts the emotion
+    max_length: int = 128  # tokens read by each classifier
+
+
+@dataclass(frozen=True)
 class Config:
     models: ModelIds
     runtime: Runtime
     languages: Languages
     revisions: dict = field(default_factory=dict)  # model id -> pinned commit (tools/pin_models.py)
+    emotion: EmotionSettings = field(default_factory=EmotionSettings)
 
 
 def _section(raw: dict[str, Any], key: str) -> dict[str, Any]:
@@ -85,6 +97,25 @@ def _revisions(raw: dict[str, Any]) -> dict[str, str]:
         if not isinstance(model, str) or not isinstance(commit, str) or not commit.strip():
             raise ConfigError(f"revisions.{model} must be a non-empty string")
     return {m: c.strip() for m, c in value.items()}
+
+
+def _emotion(raw: dict[str, Any]) -> EmotionSettings:
+    section = raw.get("emotion") or {}
+    if not isinstance(section, dict):
+        raise ConfigError("emotion must be a mapping")
+    base = EmotionSettings()
+    values = {}
+    for key in ("min_prob", "label_prob", "irony_prob", "irony_low"):
+        value = section.get(key, getattr(base, key))
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not 0 <= value <= 1:
+            raise ConfigError(f"emotion.{key} must be a number from 0 to 1")
+        values[key] = float(value)
+    values["max_length"] = (
+        _positive_int(section, "max_length", "emotion")
+        if "max_length" in section
+        else base.max_length
+    )
+    return EmotionSettings(**values)
 
 
 def load_config(path: Path | str | None = None) -> Config:
@@ -132,4 +163,5 @@ def load_config(path: Path | str | None = None) -> Config:
             target=_text(languages, "target", "languages"),
         ),
         revisions=_revisions(raw),
+        emotion=_emotion(raw),
     )
