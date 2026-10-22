@@ -206,8 +206,8 @@ def tone_side_html(name: str, side: dict | None) -> str:
         return f'<div class="mg-tone">{head}not available</div>'
     sentiment = escape(side["sentiment"])
     chips = [
-        f'<span class="mg-chip mg-s-{sentiment}">{sentiment}</span>',
-        f'<span class="mg-chip">{escape(side["emotion"])}</span>',
+        f'<span class="mg-chip mg-s-{sentiment}">sentiment: {sentiment}</span>',
+        f'<span class="mg-chip">emotion: {escape(side["emotion"])}</span>',
     ]
     if side["sarcasm"]:
         chips.append('<span class="mg-chip mg-sarcasm">possible sarcasm</span>')

@@ -131,5 +131,6 @@ def test_tone_side_html():
     }
     html = R.tone_side_html("English source", side)
     assert "mg-s-negative" in html and "possible sarcasm" in html and "width:80%" in html
+    assert "sentiment: negative" in html and "emotion: anger" in html
     assert "possible sarcasm" not in R.tone_side_html("x", {**side, "sarcasm": None})
     assert "not available" in R.tone_side_html("Hindi translation", None)
