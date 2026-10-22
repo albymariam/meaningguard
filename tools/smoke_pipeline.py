@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import statistics
 import sys
 import time
@@ -175,6 +176,7 @@ def main(argv=None) -> int:
     parser.add_argument("--tone", action="store_true", help="also run the emotion models")
     parser.add_argument("--out", default=str(ROOT / "reports" / "smoke_pipeline.json"))
     args = parser.parse_args(argv)
+    os.environ["MEANINGGUARD_CACHE"] = "off"  # a smoke test must time the real models
 
     from meaningguard.pipeline import build_pipeline
 

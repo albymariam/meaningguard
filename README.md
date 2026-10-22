@@ -50,5 +50,8 @@ create a read token, and set it. Never commit it.
 
 IndicTrans2 is tried first, then the Google fallback (`runtime.google_fallback` in `config.yaml`).
 Add `build_pipeline(tone=True)` for the emotion and sarcasm check (spec 08).
+Web app: `python -m streamlit run app.py` (examples, highlighted findings, repair diff, tone panel).
+Model outputs (translations, tone scores) are cached in `.cache/meaningguard.sqlite`, so repeat sentences
+are instant: `python -m meaningguard.cache stats|clear`; turn off with `cache: {enabled: false}`.
 Pin the model versions once with `python tools/pin_models.py --write`.
 Dev check on real translations: `python tools/compare_translations.py --verify`.

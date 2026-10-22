@@ -370,7 +370,7 @@ def _fact_text(f: dict | None) -> str:
     return " ".join(parts)
 
 
-def _describe_diff(d: Diff) -> tuple:
+def describe_diff(d: Diff) -> tuple:
     if isinstance(d.src, dict) or isinstance(d.tgt, dict):
         return _describe(d.src), _describe(d.tgt)
     return str(d.src), str(d.tgt)
@@ -560,7 +560,7 @@ class _Run:
         if code == "FACT_MISSING" and self.partial:
             code = "UNVERIFIED"
         shown = next(d for d in diffs if d.code == code)
-        a, b = _describe_diff(shown)
+        a, b = describe_diff(shown)
         self.add(code, _MESSAGES[code].format(s=a, t=b), clause, s, t, diffs, unique=unique)
 
     # -- clauses ---------------------------------------------------------------------------

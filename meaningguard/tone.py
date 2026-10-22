@@ -71,12 +71,16 @@ class ToneChecker:
             close()
 
 
-def build_tone_checker(cfg: Config | None = None, device: str | None = None) -> ToneChecker:
+def build_tone_checker(
+    cfg: Config | None = None, device: str | None = None, cache=None
+) -> ToneChecker:
+    from .cache import CachedTranslator, open_cache
     from .check_models import resolve_device
     from .translator import Translator
 
     cfg = cfg or load_config()
     device = device or resolve_device(cfg.runtime.device)
+    cache = cache or open_cache(cfg)
     back = Translator(
         cfg,
         cfg.models.indic_en,
@@ -85,4 +89,6 @@ def build_tone_checker(cfg: Config | None = None, device: str | None = None) -> 
         device,
         revision=cfg.revisions.get(cfg.models.indic_en),
     )
-    return ToneChecker(build_analyzer(cfg, device), back)
+    return ToneChecker(
+        build_analyzer(cfg, device, cache), CachedTranslator(back, cache) if cache else back
+    )

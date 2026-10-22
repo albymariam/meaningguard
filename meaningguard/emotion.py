@@ -66,6 +66,10 @@ class HfClassifier:
     max_length: int = 128
     _pipe: object = field(default=None, init=False, repr=False)
 
+    @property
+    def cache_key(self) -> tuple:
+        return (self.model_id, self.revision, self.kind, self.max_length)
+
     def _load(self):
         from transformers import pipeline
 
@@ -206,17 +210,22 @@ class EmotionAnalyzer:
                 close()
 
 
-def build_analyzer(cfg: Config | None = None, device: str | None = None) -> EmotionAnalyzer:
+def build_analyzer(
+    cfg: Config | None = None, device: str | None = None, cache=None
+) -> EmotionAnalyzer:
     """The three pinned pretrained models; nothing is downloaded until the first sentence."""
+    from .cache import CachedClassifier, open_cache
     from .check_models import resolve_device
 
     cfg = cfg or load_config()
     device = device or resolve_device(cfg.runtime.device)
+    cache = cache or open_cache(cfg)
 
-    def make(model_id: str, kind: str) -> HfClassifier:
-        return HfClassifier(
+    def make(model_id: str, kind: str):
+        model = HfClassifier(
             model_id, kind, cfg.revisions.get(model_id), device, cfg.emotion.max_length
         )
+        return CachedClassifier(model, cache) if cache else model
 
     return EmotionAnalyzer(
         make(cfg.models.sentiment, "sentiment"),

@@ -7,4 +7,5 @@ __pycache__/
 .env
 .streamlit/secrets.toml
 reports/model_check.json
-reports/
+space_build/
+.cache/

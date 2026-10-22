@@ -34,6 +34,19 @@ class Translator:
     def name(self) -> str:
         return self.model_id
 
+    @property
+    def cache_key(self) -> tuple:
+        """Everything that changes the output for a given sentence (not the device)."""
+        runtime = self.cfg.runtime
+        return (
+            self.model_id,
+            self.revision,
+            self.src,
+            self.tgt,
+            runtime.num_beams,
+            runtime.max_length,
+        )
+
     def _load(self) -> tuple:
         from IndicTransToolkit import IndicProcessor
         from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
@@ -116,6 +129,10 @@ class GoogleFallback:
     @property
     def name(self) -> str:
         return "google (deep-translator)"
+
+    @property
+    def cache_key(self) -> tuple:
+        return ("google", self.source, self.target)
 
     def translate(self, sentences: list[str]) -> list[str]:
         import time

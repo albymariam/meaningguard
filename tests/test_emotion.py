@@ -208,6 +208,7 @@ def test_build_analyzer_uses_config_models_revisions_and_thresholds():
         runtime=cfg.runtime,
         revisions={cfg.models.irony_en: "r1"},
         emotion=EmotionSettings(irony_prob=0.9, max_length=64),
+        cache=cfg.cache,
     )
     a = build_analyzer(pinned, device="cpu")
     assert [a.sentiment.model_id, a.emotion.model_id, a.irony.model_id] == [

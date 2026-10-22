@@ -1,4 +1,5 @@
-﻿id,kind,english,hindi_reference,hindi_target,what_is_wrong_in_target,reference_ok (Y/N),target_wrong_as_described (Y/N),corrected_hindi,notes
+﻿
+id,kind,english,hindi_reference,hindi_target,what_is_wrong_in_target,reference_ok (Y/N),target_wrong_as_described (Y/N),corrected_hindi,notes
 c001,corruption,The registration fee is ₹500.,पंजीकरण शुल्क ₹500 है।,पंजीकरण शुल्क ₹50 है।,NUMBER_CHANGED - digit dropped,,,,
 c002,corruption,"Please pay Rs. 1,250 at the counter.","कृपया काउंटर पर ₹1,250 का भुगतान करें।","कृपया काउंटर पर ₹1,520 का भुगतान करें।",NUMBER_CHANGED - digits swapped,,,,
 c003,corruption,The ticket costs $45.,टिकट की कीमत $45 है।,टिकट की कीमत ₹45 है।,CURRENCY_CHANGED - USD became INR,,,,

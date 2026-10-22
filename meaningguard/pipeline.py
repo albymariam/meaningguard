@@ -12,6 +12,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 
+from .cache import CachedTranslator, Tally, open_cache
 from .config import Config, load_config
 from .ir import IR, compile_text
 from .repair import RepairResult, repair
@@ -94,6 +95,7 @@ class Result:
     repair: RepairResult
     timings: dict = field(default_factory=dict)
     tone: ToneResult | None = None  # None when the tone check is off
+    cache: dict = field(default_factory=dict)  # {'hits': n, 'misses': n} of the model calls
 
     @property
     def before(self) -> Report:
@@ -121,6 +123,7 @@ class Result:
             "source_ir": self.source_ir.to_dict(),
             "target_ir": self.target_ir.to_dict(),
             "tone": self.tone.to_dict() if self.tone else None,
+            "cache": self.cache,
             "timings": self.timings,
         }
 
@@ -132,7 +135,9 @@ class Pipeline:
         do_repair: bool = True,
         tone: ToneChecker | None = None,
         tone_timeout: float | None = 180,
+        cache=None,
     ):
+        self.cache = cache
         self.chain = chain
         self.do_repair = do_repair
         self.tone = tone
@@ -142,6 +147,8 @@ class Pipeline:
         """Raises ``EmptyInput`` / ``InputTooLong`` for a bad source and ``TranslationFailed`` when
         no translation was given and the whole chain failed."""
         timings: dict = {}
+        tally = Tally(self.cache)
+        tally.start()
         start = time.perf_counter()
         source_ir = compile_text(source, "en")
         timings["compile_source_ms"] = _ms(start)
@@ -169,6 +176,7 @@ class Pipeline:
             repair=outcome,
             timings=timings,
             tone=tone,
+            cache=tally.delta(),
         )
 
     def _tone(self, source_ir: IR, outcome: RepairResult, timings: dict) -> ToneResult | None:
@@ -200,14 +208,16 @@ def _ms(start: float) -> float:
 
 
 def build_pipeline(
-    cfg: Config | None = None, device: str | None = None, tone: bool = False
+    cfg: Config | None = None, device: str | None = None, tone: bool = False, cache=None
 ) -> Pipeline:
     """IndicTrans2 first, then Google if the config allows it. Nothing is loaded until first use.
-    ``tone=True`` adds the emotion and sarcasm check (spec 08)."""
+    ``tone=True`` adds the emotion and sarcasm check (spec 08). Model outputs are cached on disk
+    when ``cfg.cache`` is on (``cache`` passes a ready ``Cache`` instead)."""
     from .check_models import resolve_device
     from .translator import GoogleFallback, Translator
 
     cfg = cfg or load_config()
+    cache = cache or open_cache(cfg)
     primary = Translator(
         cfg,
         cfg.models.en_indic,
@@ -217,5 +227,7 @@ def build_pipeline(
         revision=cfg.revisions.get(cfg.models.en_indic),
     )
     chain = [primary] + ([GoogleFallback()] if cfg.runtime.google_fallback else [])
-    checker = build_tone_checker(cfg, device) if tone else None
-    return Pipeline(ChainTranslator(chain, cfg.runtime.timeout_seconds), tone=checker)
+    if cache:
+        chain = [CachedTranslator(t, cache) for t in chain]
+    checker = build_tone_checker(cfg, device, cache) if tone else None
+    return Pipeline(ChainTranslator(chain, cfg.runtime.timeout_seconds), tone=checker, cache=cache)

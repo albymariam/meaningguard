@@ -188,6 +188,7 @@ def test_build_pipeline_wires_the_chain_from_config(monkeypatch):
         runtime=SimpleNamespace(**{**cfg.runtime.__dict__, "google_fallback": False}),
         languages=cfg.languages,
         revisions={cfg.models.en_indic: "abc123"},
+        cache=cfg.cache,
     )
     chain = build_pipeline(off, device="cpu").chain
     assert [t.name for t in chain.translators] == [cfg.models.en_indic]

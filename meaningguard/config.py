@@ -53,12 +53,21 @@ class EmotionSettings:
 
 
 @dataclass(frozen=True)
+class CacheSettings:
+    """Persistent cache of the slow model calls (translations and classifier scores)."""
+
+    enabled: bool = True
+    path: str = ".cache/meaningguard.sqlite"  # relative paths start at the project folder
+
+
+@dataclass(frozen=True)
 class Config:
     models: ModelIds
     runtime: Runtime
     languages: Languages
     revisions: dict = field(default_factory=dict)  # model id -> pinned commit (tools/pin_models.py)
     emotion: EmotionSettings = field(default_factory=EmotionSettings)
+    cache: CacheSettings = field(default_factory=CacheSettings)
 
 
 def _section(raw: dict[str, Any], key: str) -> dict[str, Any]:
@@ -118,6 +127,15 @@ def _emotion(raw: dict[str, Any]) -> EmotionSettings:
     return EmotionSettings(**values)
 
 
+def _cache(raw: dict[str, Any]) -> CacheSettings:
+    section = raw.get("cache") or {}
+    if not isinstance(section, dict):
+        raise ConfigError("cache must be a mapping")
+    base = CacheSettings()
+    path = _text(section, "path", "cache") if "path" in section else base.path
+    return CacheSettings(_boolean(section, "enabled", "cache", base.enabled), path)
+
+
 def load_config(path: Path | str | None = None) -> Config:
     """Load and validate the configuration file."""
     target = Path(path) if path is not None else DEFAULT_PATH
@@ -164,4 +182,5 @@ def load_config(path: Path | str | None = None) -> Config:
         ),
         revisions=_revisions(raw),
         emotion=_emotion(raw),
+        cache=_cache(raw),
     )
