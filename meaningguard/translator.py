@@ -13,6 +13,11 @@ from dataclasses import dataclass, field
 from .config import Config
 
 
+def _is_cache_error(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return any(word in text for word in ("shape", "cache", "past_key"))
+
+
 @dataclass
 class Translator:
     cfg: Config
@@ -23,6 +28,7 @@ class Translator:
     batch_size: int = 8
     revision: str | None = None  # pinned commit of the model, from config.revisions
     _loaded: tuple | None = field(default=None, init=False, repr=False)
+    _use_cache: bool | None = field(default=None, init=False, repr=False)  # set by a cache failure
 
     @property
     def name(self) -> str:
@@ -44,6 +50,19 @@ class Translator:
         return self._loaded
 
     def _generate(self, model, encoded) -> object:
+        """Generate with the configured cache setting. IndicTrans2's remote code can fail inside
+        ``generate`` with a key-value cache error (``'NoneType' ... 'shape'``) on some transformers
+        versions; the first such failure switches the cache off for this translator and retries."""
+        use_cache = self.cfg.runtime.use_cache if self._use_cache is None else self._use_cache
+        try:
+            return self._run(model, encoded, use_cache)
+        except (AttributeError, TypeError, ValueError, RuntimeError) as exc:
+            if not use_cache or not _is_cache_error(exc):
+                raise
+            self._use_cache = False
+            return self._run(model, encoded, False)
+
+    def _run(self, model, encoded, use_cache: bool) -> object:
         import torch
 
         runtime = self.cfg.runtime
@@ -52,7 +71,7 @@ class Translator:
                 **encoded,
                 num_beams=runtime.num_beams,
                 num_return_sequences=1,
-                use_cache=runtime.use_cache,
+                use_cache=use_cache,
                 max_length=runtime.max_length,
             )
 

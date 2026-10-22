@@ -89,3 +89,31 @@ def test_pinned_revision_reaches_from_pretrained(monkeypatch):
     translator._load()
     assert [o["revision"] for _, o in seen] == ["abc123", "abc123"]
     assert all(o["trust_remote_code"] for _, o in seen)
+
+
+def test_cache_failure_retries_once_without_the_cache(monkeypatch):
+    translator = Translator(load_config(), "m", "eng_Latn", "hin_Deva", "cpu")
+    calls = []
+
+    def run(model, encoded, use_cache):
+        calls.append(use_cache)
+        if use_cache:
+            raise AttributeError("'NoneType' object has no attribute 'shape'")
+        return "ok"
+
+    monkeypatch.setattr(translator, "_run", run)
+    assert translator._generate(None, None) == "ok" and calls == [True, False]
+    assert translator._generate(None, None) == "ok" and calls == [True, False, False]
+
+
+def test_other_errors_are_not_swallowed(monkeypatch):
+    import pytest
+
+    translator = Translator(load_config(), "m", "eng_Latn", "hin_Deva", "cpu")
+
+    def run(model, encoded, use_cache):
+        raise RuntimeError("CUDA out of memory")
+
+    monkeypatch.setattr(translator, "_run", run)
+    with pytest.raises(RuntimeError, match="out of memory"):
+        translator._generate(None, None)

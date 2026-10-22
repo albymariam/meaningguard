@@ -18,4 +18,9 @@ languages:
   target: hin_Deva
 
 # Pinned model commits: run `python tools/pin_models.py --write` once on a machine with internet.
-revisions: {}
+revisions:
+  ai4bharat/indictrans2-en-indic-dist-200M: 2cfd0a20057756d756bf3e53528f492afc52f91a
+  ai4bharat/indictrans2-indic-en-dist-200M: d66a2122ad6d28184f3dc3797b652bd80ae3f65f
+  cardiffnlp/twitter-roberta-base-irony: 3bf8f118bdf6b00c99658151ef10c9a0b9afd6bf
+  cardiffnlp/twitter-xlm-roberta-base-sentiment: f2f1202b1bdeb07342385c3f807f9c07cd8f5cf8
+  j-hartmann/emotion-english-distilroberta-base: 0e1cd914e3d46199ed785853e12b57304e04178b
