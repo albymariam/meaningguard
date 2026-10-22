@@ -1,0 +1,10 @@
+# Colab (GPU) evaluation runs. torch and numpy come preinstalled with Colab, so they are not listed.
+# Restart the runtime after installing if Colab asks you to.
+transformers>=4.51,<5
+sentencepiece
+huggingface_hub
+indictranstoolkit
+deep-translator
+pyyaml
+scikit-learn
+pandas

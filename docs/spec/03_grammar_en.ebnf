@@ -1,0 +1,67 @@
+(* 03 English grammar (v1). Island parser: unrecognised tokens are skipped between facts.
+   Notation: ISO EBNF. -> shows the AST node built. Terminals in CAPS are token types from 01_lexical.md. *)
+
+Sentence      = Clause , { ClauseSep , Clause } , [ SENT_END ] ;
+ClauseSep     = "," | ";" | "and" | "but" | "while" | "so" ;
+
+Clause        = Conditional | Simple ;
+Conditional   = COND_IF , Simple , [ "," ] , [ COND_THEN ] , Simple          -> Cond(IF, A, B)
+              | Simple , [ "," ] , COND_IF , Simple                           -> Cond(IF, A, B)
+              | Simple , [ "," ] , COND_UNLESS , Simple                       -> Cond(UNLESS, A, B)
+              | Simple , [ "," ] , COND_ELSE , Simple                         -> Cond(ELSE, B)
+              | COND_IF , Simple , [ "," ] , Simple ;                         (* "if A, B" without then *)
+
+Simple        = { Skip } , Core , { Skip | Core } ;   (* several facts per clause are allowed *)
+Core          = ChangeFact | RangeFact | BoundFact | TimeFact | QuantFact | NegPhrase ;
+
+(* ---- quantities ---- *)
+QuantFact     = [ Approx ] , Value                                           -> Quant(v, approx)
+Approx        = APPROX ;
+Value         = Money | Percent | Count | VagueQ ;
+Money         = CURRENCY , Amount | Amount , CURRENCY | Amount , "/-"        -> Money(amount, code)
+Percent       = Amount , PERCENT                                              -> Percent(amount)
+Count         = Amount ;
+VagueQ        = VAGUE ;
+Amount        = Term , { Term } ;                                             (* scales must strictly decrease, NUM-6 *)
+Term          = Magnitude , [ SCALE ] | FractionWord , [ Magnitude ] , SCALE ;
+Magnitude     = NUMBER | NUMWORD , { NUMWORD | "and" , NUMWORD } ;
+
+(* ---- comparisons ---- *)
+ChangeFact    = [ Subject ] , ( RISE | FALL ) , ChangeOperand                -> Change(dir, from, to, delta)
+ChangeOperand = FROM , Value , TO , Value
+              | TO , Value
+              | "by" , Value
+              | FROM , Value ;
+Subject       = { WORD } ;                      (* kept as opaque text, never compared *)
+RangeFact     = BETWEEN , Value , RANGE_AND , Value                           -> Range(lo, hi)
+              | FROM , Value , TO , Value
+              | Value , ( TO | "-" ) , Value ;
+BoundFact     = ( GT | GTE | LT | LTE ) , Value                               -> Bound(op, v)
+
+(* ---- time ---- *)
+TimeFact      = TimeRel , Anchor                                              -> TimeRel(rel, anchor)
+TimeRel       = TIME_BEFORE | TIME_AFTER | TIME_BY | TIME_UNTIL | TIME_ON | TIME_WITHIN ;
+Anchor        = TIME_LITERAL | DAY | Date | DayPart ;
+Date          = [ NUMBER ] , MONTH , [ NUMBER ] | NUMBER , MONTH ;
+DayPart       = TIMEMARK ;
+
+(* ---- negation ---- *)
+NegPhrase     = NegRel | NegPred | NegQuant ;
+NegRel        = NEG , TimeFact | NEG , BoundFact   -> Neg(REL, inner)         (* adjacency rule, 02 section 3 *)
+NegPred       = [ Aux ] , NEG , WORD                -> Neg(CLAUSE, verb)
+              | NEG_PRON                             -> Neg(CLAUSE, pron)
+NegQuant      = NEG_PREP , ( Value | WORD )         -> Neg(QUANT, target)
+Aux           = "do" | "does" | "did" | "will" | "would" | "can" | "could" | "should" | "shall"
+              | "may" | "might" | "must" | "is" | "are" | "was" | "were" | "has" | "have" | "had" | "need" ;
+
+Skip          = WORD | PUNCT ;                   (* recovery: skipped, counted in Tier-2 coverage *)
+
+(* Unsupported structure. "or" and "either ... or" between facts are not modelled. They are skipped,
+   the diagnostic UNSUPPORTED_STRUCTURE is raised, and the parse tier is 2, so alternatives are never
+   silently flattened into a conjunction without a warning. The same applies to Hindi "या" and "या तो ... या". *)
+
+(* Error recovery (panic mode). On a failed Core, skip tokens until the next sync token:
+   ClauseSep, SENT_END, COND_*, RISE, FALL, FROM, TO, BETWEEN, any TIME_* or comparison word, NEG.
+   The parse tier is 1 if no token was skipped inside a recognised island and every non-Skip token
+   was consumed; 2 if any token was skipped by recovery; 3 only when the island parser returns no
+   facts at all (the lexer-only check then applies). *)

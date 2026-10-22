@@ -1,0 +1,13 @@
+# Full runtime (WSL2/Linux, macOS, Hugging Face Spaces).
+# CPU-only torch wheels keep the install small; Colab uses requirements-colab.txt instead.
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+torch>=2.5
+numpy>=2.1
+transformers>=4.51,<5
+sentencepiece
+huggingface_hub
+indictranstoolkit
+deep-translator
+streamlit
+pyyaml

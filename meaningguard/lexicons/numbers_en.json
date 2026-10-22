@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "units": {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7,
+    "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
+    "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19
+  },
+  "tens": {
+    "twenty": 20, "thirty": 30, "forty": 40, "fourty": 40, "fifty": 50, "sixty": 60,
+    "seventy": 70, "eighty": 80, "ninety": 90
+  },
+  "fractions": {
+    "half": 0.5, "a half": 0.5, "quarter": 0.25, "a quarter": 0.25, "three quarters": 0.75, "third": 0.3333333333333333
+  },
+  "ordinals": [
+    "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth", "1st", "2nd", "3rd"
+  ],
+  "rules": [
+    "Compound tens-units may be hyphenated or spaced: twenty-five, twenty five.",
+    "'and' inside a number word run joins hundred to the remainder: one hundred and five = 105.",
+    "'a hundred', 'a thousand', 'a lakh' mean 1 x scale.",
+    "'half' and 'quarter' multiply the following scale: half a million = 500000, a quarter of a crore = 2500000.",
+    "'one' as a pronoun ('no one', 'one of them') is not a number; the parser accepts it only before a scale word, a currency, or a unit.",
+    "Ordinals are never quantities."
+  ]
+}

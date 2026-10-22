@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "scales": [
+    {"value": 100, "forms": ["hundred", "सौ"], "attached": []},
+    {"value": 1000, "forms": ["thousand", "हज़ार", "हजार"], "attached": ["k"]},
+    {"value": 100000, "forms": ["lakh", "lakhs", "lac", "lacs", "लाख"], "attached": ["l"]},
+    {"value": 1000000, "forms": ["million", "mn", "मिलियन"], "attached": ["m", "mn"]},
+    {"value": 10000000, "forms": ["crore", "crores", "cr", "करोड़", "करोड"], "attached": ["cr"]},
+    {"value": 1000000000, "forms": ["billion", "bn", "बिलियन", "अरब"], "attached": ["b", "bn"]},
+    {"value": 100000000000, "forms": ["खरब"], "attached": []},
+    {"value": 1000000000000, "forms": ["trillion", "ट्रिलियन"], "attached": []}
+  ],
+  "exact_units": [
+    {"value": 12, "forms": ["dozen", "दर्जन"]}
+  ],
+  "vague": {
+    "en": ["hundreds", "thousands", "lakhs of", "crores of", "millions", "billions", "dozens", "several", "many", "few", "couple"],
+    "hi": ["सैकड़ों", "हज़ारों", "हजारों", "लाखों", "करोड़ों", "अरबों", "कई", "कुछ", "दर्जनों"]
+  },
+  "notes": [
+    "अरब means 10^9 after a number and 'Arab' elsewhere; it is a scale only when a number precedes it.",
+    "Attached single letters (l, m, b) set AMBIGUOUS_ABBREV.",
+    "Vague quantifiers carry no value. The verifier requires the target to contain a vague quantifier of equal or larger order, otherwise it reports VAGUE_QUANTITY_CHANGED."
+  ]
+}

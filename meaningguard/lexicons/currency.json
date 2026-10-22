@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "entries": [
+    {"code": "INR", "symbols": ["₹"], "words": ["rs", "rs.", "inr", "rupee", "rupees", "रुपये", "रुपए", "रुपया", "रुपयों", "रू", "रु", "रु."], "suffix_markers": ["/-"]},
+    {"code": "USD", "symbols": ["$", "US$"], "words": ["usd", "dollar", "dollars", "डॉलर", "डालर", "डॉलर्स"], "note": "$ is read as USD; CAD and AUD are not distinguished"},
+    {"code": "EUR", "symbols": ["€"], "words": ["eur", "euro", "euros", "यूरो"]},
+    {"code": "GBP", "symbols": ["£"], "words": ["gbp", "pound", "pounds", "पाउंड"]},
+    {"code": "JPY", "symbols": ["¥"], "words": ["jpy", "yen", "येन"], "note": "¥ is also used for CNY; treated as JPY, flagged ambiguous"}
+  ],
+  "rules": [
+    "A currency token attaches to the nearest number on either side with no other word between, except that a single '.' after rs/रु is part of the word.",
+    "A number with no currency token has currency null, never a default.",
+    "Currency in source and target must have the same ISO code, or the fact is reported as CURRENCY_CHANGED."
+  ]
+}

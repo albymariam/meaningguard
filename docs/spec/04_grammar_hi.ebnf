@@ -1,0 +1,73 @@
+(* 04 Hindi grammar (v1). Same AST as 03_grammar_en.ebnf; only surface order differs.
+   Hindi is verb-final and uses postpositions: a relation word FOLLOWS its operand.
+   Rules are anchored on fixed particles so free word order matters less.
+   REVIEW REQUIRED by a fluent speaker before Phase 3. Extend only from the Phase 2 dev corpus. *)
+
+Sentence      = Clause , { ClauseSep , Clause } , [ SENT_END ] ;
+ClauseSep     = "," | ";" | "और" | "लेकिन" | "पर" | "मगर" | "जबकि" | "इसलिए" ;
+
+Clause        = Conditional | Simple ;
+Conditional   = COND_IF , Simple , [ "," ] , [ COND_THEN ] , Simple          -> Cond(IF, A, B)
+              | Simple , [ "," ] , COND_IF , Simple                           -> Cond(IF, A, B)
+              | JabTak , [ "," ] , Simple                                     -> Cond(IF, Neg(A), B)  (* C-UNLESS *)
+              | Simple , [ "," ] , COND_ELSE , Simple                         -> Cond(ELSE, B) ;
+JabTak        = "जब तक" , Simple ;      (* the NEG inside is part of the construct and is consumed *)
+
+Simple        = { Skip } , Core , { Skip | Core } ;
+Core          = ChangeFact | RangeFact | BoundFact | TimeFact | QuantFact | NegPhrase ;
+
+(* ---- quantities ---- *)
+QuantFact     = [ APPROX ] , Value                                           -> Quant(v, approx)
+Value         = Money | Percent | Count | VagueQ ;
+Money         = CURRENCY , Amount | Amount , CURRENCY | Amount , "/-"        -> Money(amount, code)
+Percent       = Amount , PERCENT ;
+Count         = Amount ;
+VagueQ        = VAGUE ;
+Amount        = Term , { Term } ;
+Term          = Magnitude , [ SCALE ] | FractionWord , [ Magnitude ] , [ SCALE ] ;
+Magnitude     = NUMBER | NUMWORD , { NUMWORD } ;
+
+(* ---- the particle से (FROM_OR_THAN) is resolved by pairing, never by itself ---- *)
+(* 1. Value से Value तक             -> Range or Change  (FROM ... TO)
+   2. Value से <GT|LT word>          -> Bound            (than)
+   3. Value से  (nothing else)       -> Quant(role=AMBIGUOUS) plus diagnostic AMBIGUOUS_FROM; parse tier 2.
+      The number is still emitted so that number checks keep working. *)
+RangeFact     = Value , "से" , Value , "तक"                                  -> Range(lo, hi)
+              | Value , "के बीच"                                              (* needs two Values: Value "और" Value "के बीच" *)
+              | Value , "और" , Value , "के बीच"                               -> Range(lo, hi)
+              | Value , "-" , Value ;
+ChangeFact    = RangeFact , ChangeVerb                                        -> Change(dir, from, to)
+              | Value , "से" , Value , "तक" , ChangeVerb
+              | Value , "की" , "बढ़त" ;
+ChangeVerb    = RISE | FALL ;
+BoundFact     = Value , ( GT | LT )                                           -> Bound(op, v)    (* ₹५०० से ज़्यादा *)
+              | ( GTE | LTE ) , Value                                          (* कम से कम ₹५०० *)
+              | Value , ( GTE | LTE ) ;                                        (* ₹५०० अधिकतम is rare; accepted *)
+
+(* ---- time ---- *)
+TimeFact      = Anchor , TimeRelPost                                          -> TimeRel(rel, anchor)
+TimeRelPost   = TIME_BEFORE | TIME_AFTER | "तक" | TIME_ON | TIME_WITHIN ;
+Anchor        = TIME_LITERAL | DAY | Date | DayPart ;
+Date          = [ NUMBER ] , MONTH , [ NUMBER ] ;
+(* "को" and "पर" are TIME_ON only directly after an Anchor; otherwise they are case markers and are skipped.
+   "तक" after an Anchor is ON_OR_BEFORE (BY_UNTIL_AMBIGUOUS). "तक" after a Value is the closing particle of RangeFact. *)
+
+(* ---- negation ---- *)
+NegPhrase     = NegRel | NegPred | NegQuant ;
+NegRel        = TimeFact , NEG , ClauseEnd            -> Neg(REL, inner)         (* शुक्रवार के बाद नहीं *)
+              | BoundFact , NEG , ClauseEnd ;
+ClauseEnd     = SENT_END | "," | ";" | ClauseSep | EOF ;
+NegPred       = { Skip } , NEG , { Skip } , Verb      -> Neg(CLAUSE, verb)       (* नहीं करें, मत करो, न करें *)
+              | Verb , NEG                             -> Neg(CLAUSE, verb)       (* जा नहीं रहा *)
+              | NEG_PRON ;
+NegQuant      = NEG_PREP , ( Value | WORD ) | ( Value | WORD ) , NEG_PREP ;
+Verb          = WORD ;       (* verbs are not lexicalised; the nearest WORD to the NEG within the clause is taken *)
+
+Skip          = WORD | PUNCT ;
+
+(* Non-negating uses are removed before NegPhrase is tried:
+   "नहीं तो" -> COND_ELSE;  "है न ?" -> TAG_QUESTION;  "न केवल" -> NOT_ONLY;  "ना ?" -> TAG_QUESTION.
+   A lone "ना" is never a negation. A lone "कभी" is never a negation. *)
+
+(* Error recovery is identical to 03_grammar_en.ebnf: sync on ClauseSep, SENT_END, COND_*, RISE/FALL,
+   "से", "तक", "नहीं", "मत", any TIME_* or comparison word. *)

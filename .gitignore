@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.env
+.streamlit/secrets.toml
+reports/model_check.json
+
+*:Zone.Identifier

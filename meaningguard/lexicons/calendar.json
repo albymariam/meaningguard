@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "weekdays": [
+    {"id": 0, "en": ["monday", "mon"], "hi": ["सोमवार"]},
+    {"id": 1, "en": ["tuesday", "tue", "tues"], "hi": ["मंगलवार"]},
+    {"id": 2, "en": ["wednesday", "wed"], "hi": ["बुधवार"]},
+    {"id": 3, "en": ["thursday", "thu", "thur", "thurs"], "hi": ["गुरुवार", "बृहस्पतिवार", "वीरवार"]},
+    {"id": 4, "en": ["friday", "fri"], "hi": ["शुक्रवार"]},
+    {"id": 5, "en": ["saturday", "sat"], "hi": ["शनिवार"]},
+    {"id": 6, "en": ["sunday", "sun"], "hi": ["रविवार", "इतवार"]}
+  ],
+  "months": [
+    {"id": 1, "en": ["january", "jan"], "hi": ["जनवरी"]},
+    {"id": 2, "en": ["february", "feb"], "hi": ["फ़रवरी", "फरवरी"]},
+    {"id": 3, "en": ["march", "mar"], "hi": ["मार्च"]},
+    {"id": 4, "en": ["april", "apr"], "hi": ["अप्रैल", "अप्रेल"]},
+    {"id": 5, "en": ["may"], "hi": ["मई"]},
+    {"id": 6, "en": ["june", "jun"], "hi": ["जून"]},
+    {"id": 7, "en": ["july", "jul"], "hi": ["जुलाई"]},
+    {"id": 8, "en": ["august", "aug"], "hi": ["अगस्त"]},
+    {"id": 9, "en": ["september", "sep", "sept"], "hi": ["सितंबर", "सितम्बर"]},
+    {"id": 10, "en": ["october", "oct"], "hi": ["अक्टूबर", "अक्तूबर"]},
+    {"id": 11, "en": ["november", "nov"], "hi": ["नवंबर", "नवम्बर"]},
+    {"id": 12, "en": ["december", "dec"], "hi": ["दिसंबर", "दिसम्बर"]}
+  ],
+  "time_markers": {
+    "am": ["am", "a.m.", "a.m"],
+    "pm": ["pm", "p.m.", "p.m"],
+    "oclock": ["o'clock", "बजे"],
+    "day_parts": {
+      "morning": ["morning", "सुबह", "सवेरे"],
+      "noon": ["noon", "दोपहर"],
+      "evening": ["evening", "शाम"],
+      "night": ["night", "रात"]
+    }
+  },
+  "notes": [
+    "'may' is a month only when followed by a day number or preceded by in/of/on/by; otherwise it is a modal verb and lexes as WORD.",
+    "'sat' and 'sun' and 'mar' need a capital letter or a following date to count as day/month; otherwise WORD."
+  ]
+}

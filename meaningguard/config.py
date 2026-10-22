@@ -1,0 +1,115 @@
+"""Typed, validated loader for config.yaml."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+DEFAULT_PATH = Path(__file__).resolve().parent.parent / "config.yaml"
+DEVICES = {"auto", "cpu", "cuda"}
+
+
+class ConfigError(ValueError):
+    """Raised when config.yaml is missing, malformed or has invalid values."""
+
+
+@dataclass(frozen=True)
+class ModelIds:
+    en_indic: str
+    indic_en: str
+    sentiment: str
+    emotion_en: str
+    irony_en: str
+
+
+@dataclass(frozen=True)
+class Runtime:
+    device: str
+    num_beams: int
+    max_length: int
+    use_cache: bool = True
+
+
+@dataclass(frozen=True)
+class Languages:
+    source: str
+    target: str
+
+
+@dataclass(frozen=True)
+class Config:
+    models: ModelIds
+    runtime: Runtime
+    languages: Languages
+
+
+def _section(raw: dict[str, Any], key: str) -> dict[str, Any]:
+    value = raw.get(key)
+    if not isinstance(value, dict):
+        raise ConfigError(f"missing or invalid section: {key}")
+    return value
+
+
+def _text(section: dict[str, Any], key: str, where: str) -> str:
+    value = section.get(key)
+    if not isinstance(value, str) or not value.strip():
+        raise ConfigError(f"{where}.{key} must be a non-empty string")
+    return value.strip()
+
+
+def _positive_int(section: dict[str, Any], key: str, where: str) -> int:
+    value = section.get(key)
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+        raise ConfigError(f"{where}.{key} must be a positive integer")
+    return value
+
+
+def _boolean(section: dict[str, Any], key: str, where: str, default: bool) -> bool:
+    value = section.get(key, default)
+    if not isinstance(value, bool):
+        raise ConfigError(f"{where}.{key} must be true or false")
+    return value
+
+
+def load_config(path: Path | str | None = None) -> Config:
+    """Load and validate the configuration file."""
+    target = Path(path) if path is not None else DEFAULT_PATH
+    try:
+        raw = yaml.safe_load(target.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise ConfigError(f"config file not found: {target}") from exc
+    except yaml.YAMLError as exc:
+        raise ConfigError(f"config file is not valid YAML: {exc}") from exc
+    if not isinstance(raw, dict):
+        raise ConfigError("config file must contain a mapping")
+
+    models = _section(raw, "models")
+    runtime = _section(raw, "runtime")
+    languages = _section(raw, "languages")
+
+    device = _text(runtime, "device", "runtime")
+    if device not in DEVICES:
+        raise ConfigError(f"runtime.device must be one of {sorted(DEVICES)}")
+
+    return Config(
+        models=ModelIds(
+            en_indic=_text(models, "en_indic", "models"),
+            indic_en=_text(models, "indic_en", "models"),
+            sentiment=_text(models, "sentiment", "models"),
+            emotion_en=_text(models, "emotion_en", "models"),
+            irony_en=_text(models, "irony_en", "models"),
+        ),
+        runtime=Runtime(
+            device=device,
+            num_beams=_positive_int(runtime, "num_beams", "runtime"),
+            max_length=_positive_int(runtime, "max_length", "runtime"),
+            use_cache=_boolean(runtime, "use_cache", "runtime", default=True),
+        ),
+        languages=Languages(
+            source=_text(languages, "source", "languages"),
+            target=_text(languages, "target", "languages"),
+        ),
+    )

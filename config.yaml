@@ -1,0 +1,16 @@
+models:
+  en_indic: ai4bharat/indictrans2-en-indic-dist-200M
+  indic_en: ai4bharat/indictrans2-indic-en-dist-200M
+  sentiment: cardiffnlp/twitter-xlm-roberta-base-sentiment
+  emotion_en: j-hartmann/emotion-english-distilroberta-base
+  irony_en: cardiffnlp/twitter-roberta-base-irony
+
+runtime:
+  device: auto        # auto | cpu | cuda
+  num_beams: 5
+  max_length: 256
+  use_cache: false     # set false if IndicTrans2 generate() fails with a key-value cache error
+
+languages:
+  source: eng_Latn
+  target: hin_Deva
