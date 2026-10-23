@@ -1,5 +1,32 @@
 {
   "split": "dev",
+  "paraphrase_controls": {
+    "none": {
+      "flagged": 0,
+      "of": 6,
+      "sentences": []
+    },
+    "digits": {
+      "flagged": 0,
+      "of": 6,
+      "sentences": []
+    },
+    "no-canon": {
+      "flagged": 4,
+      "of": 6,
+      "sentences": [
+        "Pay by Monday.",
+        "The fee is not more than ₹500.",
+        "Pay ₹500 unless you are a member.",
+        "Pay ₹500 by Monday and ₹200 by Friday."
+      ]
+    },
+    "full": {
+      "flagged": 0,
+      "of": 6,
+      "sentences": []
+    }
+  },
   "hand": {
     "n": 24,
     "systems": {
@@ -25,6 +52,18 @@
         "false_alarm_rate": 1.0,
         "recall_by_kind": {
           "hand": 0.5
+        }
+      },
+      "no-canon": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "false_alarm_rate": 0.0,
+        "recall_by_kind": {
+          "hand": 1.0
         }
       },
       "full": {

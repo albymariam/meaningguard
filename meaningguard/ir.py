@@ -162,11 +162,13 @@ class IR:
 # Compilation
 
 
-def compile_text(text: str, lang: str, emotion: dict | None = None) -> IR:
-    """Front end for one input. Raises ``EmptyInput`` or ``InputTooLong`` from the lexer."""
+def compile_text(text: str, lang: str, emotion: dict | None = None, canon: bool = True) -> IR:
+    """Front end for one input. Raises ``EmptyInput`` or ``InputTooLong`` from the lexer.
+    ``canon=False`` skips canonicalization (an ablation switch; the pipeline never uses it)."""
     sentence, res, nres = parse(text, lang)
     analyze(sentence)
-    canonicalize(sentence)
+    if canon:
+        canonicalize(sentence)
     diagnostics = _collect_diagnostics(sentence, res, nres)
     clauses = [clause_to_dict(c) for c in sentence.clauses]
     return IR(

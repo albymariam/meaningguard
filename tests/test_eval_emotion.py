@@ -102,6 +102,10 @@ def test_evaluate():
     assert (res["sarcasm"]["tp"], res["sarcasm"]["fp"], res["sarcasm"]["fn"]) == (1, 1, 0)
     assert res["confusion"]["anger->anger"] == 1 and res["confusion"]["fear->uncertain"] == 1
     assert [m[0] for m in res["sentiment_mistakes"]] == ["b", "c"]
+    assert res["by_sarcasm"] == {
+        "other": {"rows": 3, "label_accuracy": 0.5, "sentiment_accuracy": 0.0},
+        "sarcastic": {"rows": 1, "label_accuracy": 1.0, "sentiment_accuracy": 1.0},
+    }
 
 
 def test_evaluate_target_side():

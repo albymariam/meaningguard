@@ -5,7 +5,8 @@
     python tools/eval_verifier.py --split heldout --i-know-this-spends-heldout
 
 Systems: ``none`` accepts everything; ``digits`` compares the digit strings and currency signs of
-the two texts; ``full`` is the verifier. Positives are corrupted targets, negatives are controls
+the two texts; ``no-canon`` is the verifier without canonicalization (ablation); ``full`` is the
+verifier. Positives are corrupted targets, negatives are controls
 (hand-made) or the untouched MT output. Real MT output has no gold, so its flag rate is reported
 as "flagged", not as false alarms: review ``flagged_mt`` in the JSON by hand.
 """
@@ -24,11 +25,34 @@ sys.path.insert(0, str(ROOT))
 
 from meaningguard.ir import compile_text  # noqa: E402
 from meaningguard.repair import repair  # noqa: E402
+from meaningguard.verifier import verify  # noqa: E402
 
 DEVANAGARI_DIGITS = str.maketrans("०१२३४५६७८९", "0123456789")
 NUMBER = re.compile(r"[0-9०-९]+(?:[.,][0-9०-९]+)*")
 SIGNS = "₹$€£"
-SYSTEMS = ("none", "digits", "full")
+SYSTEMS = ("none", "digits", "no-canon", "full")
+
+
+# Correct translations that word the same fact differently ("by" vs "until", "unless" vs "if not",
+# "not more than" vs "at most", clause order). Written by the author, not reviewed by a native
+# speaker, and not used for tuning: they exist to show what canonicalization buys.
+PARAPHRASES = [
+    ("Pay by Monday.", "सोमवार तक भुगतान करें।"),
+    ("The fee is not more than ₹500.", "शुल्क ₹500 से अधिक नहीं है।"),
+    ("Pay ₹500 unless you are a member.", "यदि आप सदस्य नहीं हैं तो ₹500 का भुगतान करें।"),
+    ("Pay ₹500 by Monday and ₹200 by Friday.", "शुक्रवार तक ₹200 और सोमवार तक ₹500 का भुगतान करें।"),
+    ("Submit before Friday.", "शुक्रवार से पहले जमा करें।"),
+    ("You need at least 5 people.", "कम से कम 5 लोग चाहिए।"),
+]
+
+
+def paraphrase_false_alarms() -> dict:
+    """How many equivalent translations each system wrongly flags."""
+    out = {}
+    for system in SYSTEMS:
+        hits = [src for src, tgt in PARAPHRASES if flags(system, src, tgt)[0]]
+        out[system] = {"flagged": len(hits), "of": len(PARAPHRASES), "sentences": hits}
+    return out
 
 
 def read_jsonl(path: Path) -> list:
@@ -46,6 +70,11 @@ def flags(system: str, source: str, target: str) -> tuple:
         return False, []
     if system == "digits":
         return digits_of(source) != digits_of(target), []
+    if system == "no-canon":  # ablation: both sides compiled without canonicalization
+        report = verify(
+            compile_text(source, "en", canon=False), compile_text(target, "hi", canon=False)
+        )
+        return report.status != "pass", report.codes()
     report = repair(compile_text(source, "en"), target, apply=False).before
     return report.status != "pass", report.codes()
 
@@ -168,6 +197,7 @@ def main(argv=None) -> int:
     sentences = {r["id"]: r for r in read_jsonl(ROOT / "data" / "sentences.jsonl")}
     report = {"split": args.split}
     cases = hand_cases(sentences, args.split)
+    report["paraphrase_controls"] = paraphrase_false_alarms()
     report["hand"] = {"n": len(cases), "systems": score(cases), "repair": repair_rate(cases)}
     if args.mt:
         corrupted, clean = mt_cases(sentences, Path(args.mt), args.split)
@@ -195,6 +225,9 @@ def main(argv=None) -> int:
                     f"  {system:7} P {f(m['precision'])} R {f(m['recall'])} F1 {f(m['f1'])} "
                     f"false-alarm {f(m['false_alarm_rate'])}"
                 )
+    print("equivalent paraphrases wrongly flagged (ablation of canonicalization):")
+    for system, m in report["paraphrase_controls"].items():
+        print(f"  {system:8} {m['flagged']} of {m['of']}")
     if "mt_clean" in report:
         print(f"real MT output flagged by the verifier: {report['mt_clean']} (review by hand)")
     return 0

@@ -50,6 +50,7 @@ class EmotionSettings:
     irony_prob: float = 0.9  # sarcasm on the irony score alone (tuned on dev, spec 08)
     irony_low: float = 0.35  # sarcasm when the surface sentiment contradicts the emotion
     max_length: int = 128  # tokens read by each classifier
+    neutral_guard: bool = True  # no sarcasm when sentiment and emotion are both neutral (ablation)
 
 
 @dataclass(frozen=True)
@@ -124,6 +125,7 @@ def _emotion(raw: dict[str, Any]) -> EmotionSettings:
         if "max_length" in section
         else base.max_length
     )
+    values["neutral_guard"] = _boolean(section, "neutral_guard", "emotion", base.neutral_guard)
     return EmotionSettings(**values)
 
 

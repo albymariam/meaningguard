@@ -16,11 +16,13 @@ import csv
 import json
 import sys
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from meaningguard.config import load_config  # noqa: E402
 from meaningguard.emotion import EMOTION_SENTIMENT, EMOTIONS  # noqa: E402
 
 SHEET = ROOT / "data" / "review" / "emotion_labels.csv"
@@ -118,8 +120,13 @@ def evaluate(rows: list, analyze_source, analyze_target=None, backs: dict | None
     target = Counter()
     mistakes = []
     irony: list = []
+    split: dict = {}  # accuracy apart for sarcastic and other rows
     for row in rows:
         rec = analyze_source(row["text"])
+        part = split.setdefault(bool(row["sarcasm"]), Counter())
+        part["rows"] += 1
+        part["label_n"] += rec["label"] != "uncertain"
+        part["label_ok"] += rec["label"] == row["emotion"]
         gold_sent = EMOTION_SENTIMENT.get(row["emotion"])
         confusion[(row["emotion"], rec["label"])] += 1
         if rec["label"] != "uncertain":
@@ -130,6 +137,8 @@ def evaluate(rows: list, analyze_source, analyze_target=None, backs: dict | None
         if gold_sent:
             sent_n += 1
             sent_ok += rec["sentiment"] == gold_sent
+            part["sent_n"] += 1
+            part["sent_ok"] += rec["sentiment"] == gold_sent
             for sg in rec["signals"]:
                 if sg["sentiment"]:
                     stat = per_signal.setdefault(sg["name"], [0, 0])
@@ -163,6 +172,14 @@ def evaluate(rows: list, analyze_source, analyze_target=None, backs: dict | None
             "single_signal": {k: ratio(a, b) for k, (a, b) in sorted(per_signal.items())},
         },
         "sarcasm": prf(tp, fp, fn),
+        "by_sarcasm": {
+            ("sarcastic" if key else "other"): {
+                "rows": c["rows"],
+                "label_accuracy": ratio(c["label_ok"], c["label_n"]),
+                "sentiment_accuracy": ratio(c["sent_ok"], c["sent_n"]),
+            }
+            for key, c in sorted(split.items())
+        },
         "irony_scores": irony,
         "irony_sweep": sweep(irony),
         "target": {
@@ -206,6 +223,11 @@ def show(result: dict) -> None:
         f"sarcasm: precision {sar['precision']}, recall {sar['recall']}, f1 {sar['f1']} "
         f"(tp {sar['tp']}, fp {sar['fp']}, fn {sar['fn']})"
     )
+    for name, m in result["by_sarcasm"].items():
+        print(
+            f"  {name} rows ({m['rows']}): label accuracy {m['label_accuracy']}, "
+            f"sentiment accuracy {m['sentiment_accuracy']}"
+        )
     print("irony score by row (gold sarcasm / predicted):")
     for rid, text, gold, score, pred in sorted(result["irony_scores"], key=lambda r: -(r[3] or 0)):
         shown = "n/a" if score is None else f"{score:.2f}"
@@ -235,6 +257,11 @@ def main(argv=None) -> int:
     )
     ap.add_argument("--split", default="dev", choices=["dev", "heldout"])
     ap.add_argument("--i-know-this-spends-heldout", action="store_true")
+    ap.add_argument(
+        "--no-neutral-guard",
+        action="store_true",
+        help="ablation: sarcasm without the neutral guard",
+    )
     ap.add_argument("--target", action="store_true", help="also score the Hindi side")
     ap.add_argument("--translations", default=str(ROOT / "data" / "translations.jsonl"))
     ap.add_argument("--device", default=None)
@@ -257,7 +284,11 @@ def main(argv=None) -> int:
 
     from meaningguard.emotion import build_analyzer
 
-    analyzer = build_analyzer(device=args.device)
+    cfg = load_config()
+    if args.no_neutral_guard:
+        cfg = replace(cfg, emotion=replace(cfg.emotion, neutral_guard=False))
+        notes.append("ablation: neutral guard OFF")
+    analyzer = build_analyzer(cfg, device=args.device)
     backs = None
     if args.target:
         path = Path(args.translations)

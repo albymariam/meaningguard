@@ -1,24 +1,36 @@
 {
-  "rows": 28,
+  "rows": 70,
   "label": {
-    "accuracy_when_labelled": 0.808,
+    "accuracy_when_labelled": 0.754,
     "coverage": 0.929
   },
   "sentiment": {
-    "accuracy": 0.808,
-    "uncertain_rate": 0.179,
+    "accuracy": 0.769,
+    "uncertain_rate": 0.214,
     "single_signal": {
-      "emotion:distilroberta": 0.88,
-      "sentiment:xlmr": 0.808
+      "emotion:distilroberta": 0.839,
+      "sentiment:xlmr": 0.815
     }
   },
   "sarcasm": {
-    "precision": 0.6666666666666666,
+    "precision": 0.6875,
     "recall": 1.0,
-    "f1": 0.8,
-    "tp": 4,
-    "fp": 2,
+    "f1": 0.8148148148148148,
+    "tp": 11,
+    "fp": 5,
     "fn": 0
+  },
+  "by_sarcasm": {
+    "other": {
+      "rows": 59,
+      "label_accuracy": 0.907,
+      "sentiment_accuracy": 0.926
+    },
+    "sarcastic": {
+      "rows": 11,
+      "label_accuracy": 0.0,
+      "sentiment_accuracy": 0.0
+    }
   },
   "irony_scores": [
     [
@@ -216,63 +228,357 @@
       false,
       0.159,
       false
+    ],
+    [
+      "s195",
+      "You lied to me again, and I have had enough.",
+      false,
+      0.116,
+      false
+    ],
+    [
+      "s196",
+      "Stop interrupting me every single time I speak!",
+      false,
+      0.406,
+      false
+    ],
+    [
+      "s198",
+      "This delay is outrageous and nobody will tell us w",
+      false,
+      0.398,
+      false
+    ],
+    [
+      "s199",
+      "How could they ignore every complaint we filed?",
+      false,
+      0.061,
+      false
+    ],
+    [
+      "s201",
+      "The milk in the fridge smells rotten and the sight",
+      false,
+      0.139,
+      false
+    ],
+    [
+      "s202",
+      "I find the way he treats waiters repulsive.",
+      false,
+      0.473,
+      false
+    ],
+    [
+      "s204",
+      "That joke was vile and I want nothing to do with i",
+      false,
+      0.135,
+      false
+    ],
+    [
+      "s205",
+      "The bathroom was filthy and the stench was unbeara",
+      false,
+      0.2,
+      false
+    ],
+    [
+      "s207",
+      "My hands are shaking because the exam results arri",
+      false,
+      0.346,
+      false
+    ],
+    [
+      "s208",
+      "I am scared that the storm will damage our house.",
+      false,
+      0.118,
+      false
+    ],
+    [
+      "s210",
+      "I worry that I will say something wrong in front o",
+      false,
+      0.192,
+      false
+    ],
+    [
+      "s211",
+      "We finally got the keys to our new home, and I cou",
+      false,
+      0.133,
+      false
+    ],
+    [
+      "s213",
+      "I am delighted that the whole family could be toge",
+      false,
+      0.274,
+      false
+    ],
+    [
+      "s216",
+      "I passed my driving test on the first try and I am",
+      false,
+      0.837,
+      false
+    ],
+    [
+      "s217",
+      "I miss my grandmother every time I smell her cooki",
+      false,
+      0.301,
+      false
+    ],
+    [
+      "s219",
+      "I am heartbroken that our friendship ended this wa",
+      false,
+      0.12,
+      false
+    ],
+    [
+      "s220",
+      "It was a quiet, lonely evening and nothing could c",
+      false,
+      0.051,
+      false
+    ],
+    [
+      "s222",
+      "I did not get the job, and I feel completely crush",
+      false,
+      0.211,
+      false
+    ],
+    [
+      "s223",
+      "I did not expect to find the whole team waiting in",
+      false,
+      0.147,
+      false
+    ],
+    [
+      "s225",
+      "I had no idea you could sing like that!",
+      false,
+      0.492,
+      false
+    ],
+    [
+      "s226",
+      "She suddenly walked in, and everyone gasped.",
+      false,
+      0.559,
+      false
+    ],
+    [
+      "s228",
+      "The train arrives at the central station.",
+      false,
+      0.683,
+      false
+    ],
+    [
+      "s229",
+      "Please submit the form at the front desk.",
+      false,
+      0.276,
+      false
+    ],
+    [
+      "s231",
+      "He opened the window and sat down.",
+      false,
+      0.269,
+      false
+    ],
+    [
+      "s232",
+      "The next meeting will be held in the library.",
+      false,
+      0.346,
+      false
+    ],
+    [
+      "s234",
+      "She works as an accountant in the city.",
+      false,
+      0.831,
+      false
+    ],
+    [
+      "s235",
+      "The package contains a cable and a manual.",
+      false,
+      0.267,
+      false
+    ],
+    [
+      "s236",
+      "Oh wonderful, the lift is broken again.",
+      true,
+      0.984,
+      true
+    ],
+    [
+      "s237",
+      "Yeah, because waiting on hold for an hour is my fa",
+      true,
+      0.988,
+      true
+    ],
+    [
+      "s239",
+      "Thanks a lot for leaving me with all the work.",
+      true,
+      0.958,
+      true
+    ],
+    [
+      "s240",
+      "Oh sure, because I have nothing better to do than ",
+      true,
+      0.908,
+      true
+    ],
+    [
+      "s242",
+      "I just love getting stuck in traffic on my day off",
+      true,
+      0.98,
+      true
+    ],
+    [
+      "s243",
+      "Wow, thanks for letting me know after the deadline",
+      true,
+      0.984,
+      true
+    ],
+    [
+      "s245",
+      "Nice work, you deleted the whole file instead of a",
+      true,
+      0.925,
+      true
+    ],
+    [
+      "s246",
+      "I just love spending a quiet day off with my famil",
+      false,
+      0.802,
+      false
+    ],
+    [
+      "s248",
+      "What a brilliant idea to start the meeting after l",
+      false,
+      0.99,
+      true
+    ],
+    [
+      "s249",
+      "Great job, you handled that difficult customer ver",
+      false,
+      0.976,
+      true
+    ],
+    [
+      "s251",
+      "Nice work, you fixed the bug very quickly.",
+      false,
+      0.981,
+      true
+    ],
+    [
+      "s253",
+      "It is not that I dislike the gift, I just wish it ",
+      false,
+      0.039,
+      false
+    ],
+    [
+      "s255",
+      "He smiled, but his eyes looked tired and sad.",
+      false,
+      0.205,
+      false
+    ],
+    [
+      "s256",
+      "The results were not bad at all.",
+      false,
+      0.473,
+      false
+    ],
+    [
+      "s259",
+      "I am so tired of pretending everything is okay.",
+      false,
+      0.541,
+      false
     ]
   ],
   "irony_sweep": {
     "0.3": {
-      "precision": 0.2222222222222222,
+      "precision": 0.2619047619047619,
       "recall": 1.0,
-      "f1": 0.3636363636363636,
-      "tp": 4,
-      "fp": 14,
+      "f1": 0.41509433962264153,
+      "tp": 11,
+      "fp": 31,
       "fn": 0
     },
     "0.4": {
-      "precision": 0.3076923076923077,
+      "precision": 0.3333333333333333,
       "recall": 1.0,
-      "f1": 0.47058823529411764,
-      "tp": 4,
-      "fp": 9,
+      "f1": 0.5,
+      "tp": 11,
+      "fp": 22,
       "fn": 0
     },
     "0.5": {
-      "precision": 0.36363636363636365,
+      "precision": 0.4074074074074074,
       "recall": 1.0,
-      "f1": 0.5333333333333333,
-      "tp": 4,
-      "fp": 7,
+      "f1": 0.5789473684210525,
+      "tp": 11,
+      "fp": 16,
       "fn": 0
     },
     "0.6": {
-      "precision": 0.4444444444444444,
+      "precision": 0.4782608695652174,
       "recall": 1.0,
-      "f1": 0.6153846153846153,
-      "tp": 4,
-      "fp": 5,
+      "f1": 0.6470588235294118,
+      "tp": 11,
+      "fp": 12,
       "fn": 0
     },
     "0.7": {
-      "precision": 0.4444444444444444,
+      "precision": 0.5,
       "recall": 1.0,
-      "f1": 0.6153846153846153,
-      "tp": 4,
-      "fp": 5,
+      "f1": 0.6666666666666666,
+      "tp": 11,
+      "fp": 11,
       "fn": 0
     },
     "0.8": {
-      "precision": 0.4444444444444444,
+      "precision": 0.5,
       "recall": 1.0,
-      "f1": 0.6153846153846153,
-      "tp": 4,
-      "fp": 5,
+      "f1": 0.6666666666666666,
+      "tp": 11,
+      "fp": 11,
       "fn": 0
     },
     "0.9": {
-      "precision": 0.5714285714285714,
+      "precision": 0.6470588235294118,
       "recall": 1.0,
-      "f1": 0.7272727272727273,
-      "tp": 4,
-      "fp": 3,
+      "f1": 0.7857142857142858,
+      "tp": 11,
+      "fp": 6,
       "fn": 0
     }
   },
@@ -282,19 +588,24 @@
     "uncertain_rate": null
   },
   "confusion": {
-    "anger->anger": 2,
-    "anger->joy": 2,
-    "anger->neutral": 1,
+    "anger->anger": 5,
+    "anger->joy": 5,
+    "anger->neutral": 3,
     "anger->sadness": 1,
-    "anger->surprise": 1,
-    "disgust->disgust": 2,
-    "fear->fear": 3,
-    "joy->joy": 5,
-    "neutral->neutral": 6,
-    "neutral->uncertain": 1,
-    "sadness->sadness": 1,
+    "anger->surprise": 3,
+    "anger->uncertain": 1,
+    "disgust->disgust": 6,
+    "fear->fear": 6,
+    "joy->disgust": 1,
+    "joy->joy": 10,
+    "joy->neutral": 1,
+    "joy->uncertain": 1,
+    "neutral->neutral": 11,
+    "neutral->uncertain": 2,
+    "sadness->disgust": 2,
+    "sadness->sadness": 6,
     "sadness->uncertain": 1,
-    "surprise->surprise": 2
+    "surprise->surprise": 5
   },
   "sentiment_mistakes": [
     [
@@ -326,8 +637,70 @@
       "Please close the door.",
       "neutral",
       "uncertain"
+    ],
+    [
+      "s234",
+      "She works as an accountant in the city.",
+      "neutral",
+      "uncertain"
+    ],
+    [
+      "s236",
+      "Oh wonderful, the lift is broken again.",
+      "negative",
+      "uncertain"
+    ],
+    [
+      "s237",
+      "Yeah, because waiting on hold for an hour is my favourite ho",
+      "negative",
+      "positive"
+    ],
+    [
+      "s239",
+      "Thanks a lot for leaving me with all the work.",
+      "negative",
+      "positive"
+    ],
+    [
+      "s240",
+      "Oh sure, because I have nothing better to do than wait for y",
+      "negative",
+      "uncertain"
+    ],
+    [
+      "s242",
+      "I just love getting stuck in traffic on my day off.",
+      "negative",
+      "positive"
+    ],
+    [
+      "s243",
+      "Wow, thanks for letting me know after the deadline passed.",
+      "negative",
+      "uncertain"
+    ],
+    [
+      "s245",
+      "Nice work, you deleted the whole file instead of a single ty",
+      "negative",
+      "uncertain"
+    ],
+    [
+      "s251",
+      "Nice work, you fixed the bug very quickly.",
+      "positive",
+      "uncertain"
+    ],
+    [
+      "s256",
+      "The results were not bad at all.",
+      "positive",
+      "uncertain"
     ]
   ],
-  "notes": [],
+  "notes": [
+    "annotators agree on 103 of 107 rows; kappa(emotion) = 0.95"
+  ],
   "split": "dev"
 }

@@ -242,3 +242,11 @@ def test_emotion_settings_can_be_overridden(tmp_path):
 
     cfg = load_config(write(tmp_path, VALID + "emotion:\n  irony_prob: 0.7\n  max_length: 64\n"))
     assert (cfg.emotion.irony_prob, cfg.emotion.max_length, cfg.emotion.min_prob) == (0.7, 64, 0.4)
+
+
+def test_neutral_guard_can_be_switched_off():
+    from dataclasses import replace
+
+    neutral = sig("neutral", 0.9)
+    assert is_sarcastic(0.95, neutral, neutral, S) is False
+    assert is_sarcastic(0.95, neutral, neutral, replace(S, neutral_guard=False)) is True

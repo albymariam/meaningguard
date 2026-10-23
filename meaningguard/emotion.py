@@ -131,7 +131,7 @@ def _neutral(signal: Signal | None, s) -> bool:
 def is_sarcastic(irony_prob: float, surface: Signal | None, emotion: Signal | None, s) -> bool:
     """Irony score alone, or a lower score when the words sound positive but the emotion is not.
     Text that sentiment and emotion both read as neutral is never sarcastic (no stance)."""
-    if _neutral(surface, s) and _neutral(emotion, s):
+    if s.neutral_guard and _neutral(surface, s) and _neutral(emotion, s):
         return False
     if irony_prob >= s.irony_prob:
         return True

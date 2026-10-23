@@ -43,4 +43,16 @@ def test_heldout_needs_the_flag(tmp_path, capsys):
 def test_main_writes_report(tmp_path):
     out = tmp_path / "r.json"
     assert ev.main(["--out", str(out)]) == 0
-    assert set(json.loads(out.read_text())["hand"]["systems"]) == {"none", "digits", "full"}
+    assert set(json.loads(out.read_text())["hand"]["systems"]) == {
+        "none",
+        "digits",
+        "no-canon",
+        "full",
+    }
+
+
+def test_canonicalization_ablation():
+    out = ev.paraphrase_false_alarms()
+    assert out["full"]["flagged"] == 0
+    assert out["no-canon"]["flagged"] > out["full"]["flagged"]
+    assert out["none"]["flagged"] == 0
