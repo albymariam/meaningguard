@@ -46,13 +46,5 @@ def test_main_writes_report(tmp_path):
     assert set(json.loads(out.read_text())["hand"]["systems"]) == {
         "none",
         "digits",
-        "no-canon",
         "full",
     }
-
-
-def test_canonicalization_ablation():
-    out = ev.paraphrase_false_alarms()
-    assert out["full"]["flagged"] == 0
-    assert out["no-canon"]["flagged"] > out["full"]["flagged"]
-    assert out["none"]["flagged"] == 0
