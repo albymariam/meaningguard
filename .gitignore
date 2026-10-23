@@ -9,3 +9,4 @@ __pycache__/
 reports/model_check.json
 space_build/
 .cache/
+*:Zone.Identifier

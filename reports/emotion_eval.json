@@ -13,14 +13,126 @@
     }
   },
   "sarcasm": {
-    "precision": 0.8,
+    "precision": 0.6666666666666666,
     "recall": 1.0,
-    "f1": 0.888888888888889,
+    "f1": 0.8,
     "tp": 4,
-    "fp": 1,
+    "fp": 2,
     "fn": 0
   },
   "irony_scores": [
+    [
+      "s153",
+      "I am furious that they cancelled my flight without",
+      false,
+      0.371,
+      false
+    ],
+    [
+      "s154",
+      "This is completely unacceptable and I demand a ref",
+      false,
+      0.1,
+      false
+    ],
+    [
+      "s156",
+      "I'm sick of being ignored by this company.",
+      false,
+      0.284,
+      false
+    ],
+    [
+      "s157",
+      "I am so happy that you could come today!",
+      false,
+      0.105,
+      false
+    ],
+    [
+      "s159",
+      "What a wonderful surprise, thank you so much!",
+      false,
+      0.543,
+      false
+    ],
+    [
+      "s160",
+      "I love how peaceful this morning is.",
+      false,
+      0.962,
+      true
+    ],
+    [
+      "s162",
+      "It breaks my heart to see the old school close.",
+      false,
+      0.186,
+      false
+    ],
+    [
+      "s163",
+      "Nothing feels the same since he left.",
+      false,
+      0.247,
+      false
+    ],
+    [
+      "s165",
+      "I'm terrified of what the doctor might say.",
+      false,
+      0.151,
+      false
+    ],
+    [
+      "s166",
+      "The noise outside made me shiver with fear.",
+      false,
+      0.151,
+      false
+    ],
+    [
+      "s168",
+      "I can't believe you remembered my birthday!",
+      false,
+      0.445,
+      false
+    ],
+    [
+      "s169",
+      "Wow, I never expected to see you here!",
+      false,
+      0.261,
+      false
+    ],
+    [
+      "s171",
+      "The smell in that kitchen was absolutely revolting",
+      false,
+      0.427,
+      false
+    ],
+    [
+      "s172",
+      "I find his behaviour utterly disgusting.",
+      false,
+      0.336,
+      false
+    ],
+    [
+      "s174",
+      "The meeting is scheduled in the main hall.",
+      false,
+      0.391,
+      false
+    ],
+    [
+      "s175",
+      "She placed the files on the desk.",
+      false,
+      0.311,
+      false
+    ],
     [
       "s177",
       "Oh great, another Monday morning meeting. Just wha",
@@ -108,22 +220,30 @@
   ],
   "irony_sweep": {
     "0.3": {
-      "precision": 0.4,
+      "precision": 0.2222222222222222,
       "recall": 1.0,
-      "f1": 0.5714285714285715,
+      "f1": 0.3636363636363636,
       "tp": 4,
-      "fp": 6,
+      "fp": 14,
       "fn": 0
     },
     "0.4": {
-      "precision": 0.4444444444444444,
+      "precision": 0.3076923076923077,
       "recall": 1.0,
-      "f1": 0.6153846153846153,
+      "f1": 0.47058823529411764,
       "tp": 4,
-      "fp": 5,
+      "fp": 9,
       "fn": 0
     },
     "0.5": {
+      "precision": 0.36363636363636365,
+      "recall": 1.0,
+      "f1": 0.5333333333333333,
+      "tp": 4,
+      "fp": 7,
+      "fn": 0
+    },
+    "0.6": {
       "precision": 0.4444444444444444,
       "recall": 1.0,
       "f1": 0.6153846153846153,
@@ -131,36 +251,28 @@
       "fp": 5,
       "fn": 0
     },
-    "0.6": {
-      "precision": 0.5,
-      "recall": 1.0,
-      "f1": 0.6666666666666666,
-      "tp": 4,
-      "fp": 4,
-      "fn": 0
-    },
     "0.7": {
-      "precision": 0.5,
+      "precision": 0.4444444444444444,
       "recall": 1.0,
-      "f1": 0.6666666666666666,
+      "f1": 0.6153846153846153,
       "tp": 4,
-      "fp": 4,
+      "fp": 5,
       "fn": 0
     },
     "0.8": {
-      "precision": 0.5,
+      "precision": 0.4444444444444444,
       "recall": 1.0,
-      "f1": 0.6666666666666666,
+      "f1": 0.6153846153846153,
       "tp": 4,
-      "fp": 4,
+      "fp": 5,
       "fn": 0
     },
     "0.9": {
-      "precision": 0.6666666666666666,
+      "precision": 0.5714285714285714,
       "recall": 1.0,
-      "f1": 0.8,
+      "f1": 0.7272727272727273,
       "tp": 4,
-      "fp": 2,
+      "fp": 3,
       "fn": 0
     }
   },
@@ -216,8 +328,6 @@
       "uncertain"
     ]
   ],
-  "notes": [
-    "gold = the author's unreviewed proposals; numbers are indicative only"
-  ],
+  "notes": [],
   "split": "dev"
 }
