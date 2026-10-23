@@ -1,0 +1,50 @@
+{
+  "split": "dev",
+  "hand": {
+    "n": 24,
+    "systems": {
+      "none": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": null,
+        "tp": 0,
+        "fp": 0,
+        "fn": 22,
+        "false_alarm_rate": 0.0,
+        "recall_by_kind": {
+          "hand": 0.0
+        }
+      },
+      "digits": {
+        "precision": 0.8461538461538461,
+        "recall": 0.5,
+        "f1": 0.6285714285714286,
+        "tp": 11,
+        "fp": 2,
+        "fn": 11,
+        "false_alarm_rate": 1.0,
+        "recall_by_kind": {
+          "hand": 0.5
+        }
+      },
+      "full": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 22,
+        "fp": 0,
+        "fn": 0,
+        "false_alarm_rate": 0.0,
+        "recall_by_kind": {
+          "hand": 1.0
+        },
+        "right_code_rate": 1.0
+      }
+    },
+    "repair": {
+      "repairable": 10,
+      "fixed": 10,
+      "rate": 1.0
+    }
+  }
+}

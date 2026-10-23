@@ -47,6 +47,14 @@ def read_sheet(path: Path) -> dict:
     return out
 
 
+def merge_sheets(paths) -> dict:
+    """One annotator's labels, possibly spread over several files (one per labelling round)."""
+    out: dict = {}
+    for path in paths:
+        out.update(read_sheet(Path(path)))
+    return out
+
+
 def kappa(pairs: list) -> float | None:
     """Cohen's kappa of two annotators' labels."""
     n = len(pairs)
@@ -220,8 +228,8 @@ def show(result: dict) -> None:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--labels", default=str(SHEET), help="your filled copy of the label sheet")
-    ap.add_argument("--labels2", help="a second annotator's filled copy")
+    ap.add_argument("--labels", nargs="+", default=[str(SHEET)], help="your filled label sheet(s)")
+    ap.add_argument("--labels2", nargs="+", help="a second annotator's filled sheet(s)")
     ap.add_argument(
         "--use-proposed", action="store_true", help="score against the unreviewed proposals"
     )
@@ -236,7 +244,7 @@ def main(argv=None) -> int:
         print("held-out is used once, at the final evaluation: add --i-know-this-spends-heldout")
         return 2
 
-    sheets = [read_sheet(Path(p)) for p in (args.labels, args.labels2) if p]
+    sheets = [merge_sheets(group) for group in (args.labels, args.labels2) if group]
     if not any(emotion for sheet in sheets for emotion, _ in sheet.values()):
         sheets = []
     sentences = read_jsonl(ROOT / "data" / "sentences.jsonl")

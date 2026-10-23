@@ -58,9 +58,7 @@ def main() -> None:
     labelled = [
         r for r in rows("sentences.jsonl") if r["category"] in ("emotion", "sarcasm", "plain")
     ]
-    write(
-        OUT / "emotion_labels.csv",
-        [
+    header = [
             "id",
             "sentence",
             "proposed_emotion",
@@ -68,8 +66,10 @@ def main() -> None:
             "your_emotion",
             "your_sarcasm (Y/N)",
             "notes",
-        ],
-        [
+        ]
+
+    def body(items):
+        return [
             [
                 r["id"],
                 r["text"],
@@ -79,11 +79,16 @@ def main() -> None:
                 "",
                 "",
             ]
-            for r in labelled
-        ],
-    )
+            for r in items
+        ]
+
+    # round 1 (s153-s194) is already labelled by hand: its file must never be regenerated over
+    first = [r for r in labelled if int(r["id"][1:]) <= 194]
+    second = [r for r in labelled if int(r["id"][1:]) > 194]
+    write(OUT / "emotion_labels.csv", header, body(first))
+    write(OUT / "emotion_labels_2.csv", header, body(second))
     print(f"wrote {OUT / 'hindi_review.csv'} ({len(pairs)} rows)")
-    print(f"wrote {OUT / 'emotion_labels.csv'} ({len(labelled)} rows)")
+    print(f"wrote emotion_labels.csv ({len(first)}) and emotion_labels_2.csv ({len(second)})")
 
 
 if __name__ == "__main__":
