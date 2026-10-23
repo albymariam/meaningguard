@@ -25,7 +25,7 @@ label is my proposal and still needs two human labels (you and a second annotato
 - Gold was corrected on dev only (s037, s080, s091, s094, s151, s153, s163, s168, s169, s177, s187). Held-out was not read.
 
 ## Open questions
-- Hindi in `corruptions.jsonl` is written by me and marked `hindi_review: pending` until a native speaker confirms it.
+- Hindi in `corruptions.jsonl` is written by the author. All 35 pairs were checked by a Hindi reader (`review/hindi_review_filled.csv`): every reference was confirmed and no correction was needed, so they are marked `hindi_review: confirmed`.
 
 ## Steps on your machine
 1. `python tools/translate_dataset.py --split dev` (add `--back` later for the emotion phase), then `--split all` before Phase 9.
