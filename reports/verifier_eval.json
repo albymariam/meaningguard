@@ -46,5 +46,121 @@
       "fixed": 10,
       "rate": 1.0
     }
-  }
+  },
+  "mt_corrupted": {
+    "n": 95,
+    "systems": {
+      "none": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": null,
+        "tp": 0,
+        "fp": 0,
+        "fn": 95,
+        "false_alarm_rate": null,
+        "recall_by_kind": {
+          "digit": 0.0,
+          "currency": 0.0,
+          "negation": 0.0
+        }
+      },
+      "digits": {
+        "precision": 1.0,
+        "recall": 0.7684210526315789,
+        "f1": 0.869047619047619,
+        "tp": 73,
+        "fp": 0,
+        "fn": 22,
+        "false_alarm_rate": null,
+        "recall_by_kind": {
+          "digit": 1.0,
+          "currency": 1.0,
+          "negation": 0.0
+        }
+      },
+      "full": {
+        "precision": 1.0,
+        "recall": 0.9894736842105263,
+        "f1": 0.9947089947089947,
+        "tp": 94,
+        "fp": 0,
+        "fn": 1,
+        "false_alarm_rate": null,
+        "recall_by_kind": {
+          "digit": 1.0,
+          "currency": 1.0,
+          "negation": 0.9545454545454546
+        },
+        "right_code_rate": 0.9893617021276596
+      }
+    },
+    "repair": {
+      "repairable": 73,
+      "fixed": 71,
+      "rate": 0.9726027397260274
+    }
+  },
+  "mt_clean": {
+    "n": 178,
+    "flagged": 7
+  },
+  "flagged_mt": [
+    {
+      "id": "s032",
+      "source": "There are twenty-five seats left.",
+      "target": "पँचिश सीटें बची हैं।",
+      "codes": [
+        "FACT_MISSING"
+      ]
+    },
+    {
+      "id": "s037",
+      "source": "Fifty-two weeks make a year.",
+      "target": "बावन सौ सप्ताह एक वर्ष बनाते हैं।",
+      "codes": [
+        "NUMBER_CHANGED"
+      ]
+    },
+    {
+      "id": "s039",
+      "source": "Sales rose 12.5% last year.",
+      "target": "पिछले साल बिक्री 12.5% से अधिक बढ़ी।",
+      "codes": [
+        "FACT_MISSING",
+        "FACT_ADDED"
+      ]
+    },
+    {
+      "id": "s118",
+      "source": "Not only the price but also the fee increased.",
+      "target": "न केवल कीमत बढ़ी, बल्कि शुल्क भी बढ़ा।",
+      "codes": [
+        "FACT_ADDED"
+      ]
+    },
+    {
+      "id": "s204",
+      "source": "That joke was vile and I want nothing to do with it.",
+      "target": "वह मजाक घटिया था और मैं इससे कुछ लेना-देना नहीं चाहता।",
+      "codes": [
+        "FACT_ADDED"
+      ]
+    },
+    {
+      "id": "s253",
+      "source": "It is not that I dislike the gift, I just wish it were different.",
+      "target": "ऐसा नहीं है कि मुझे उपहार पसंद नहीं है, मैं बस चाहता हूं कि यह अलग होता।",
+      "codes": [
+        "NEGATION_UNCERTAIN"
+      ]
+    },
+    {
+      "id": "s258",
+      "source": "No complaints at all, everything was fine.",
+      "target": "कोई शिकायत नहीं, सब कुछ ठीक था।",
+      "codes": [
+        "FACT_ADDED"
+      ]
+    }
+  ]
 }

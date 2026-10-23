@@ -135,7 +135,7 @@
       "s174",
       "The meeting is scheduled in the main hall.",
       false,
-      0.391,
+      0.392,
       false
     ],
     [
@@ -520,7 +520,7 @@
       "s259",
       "I am so tired of pretending everything is okay.",
       false,
-      0.541,
+      0.54,
       false
     ]
   ],
@@ -583,9 +583,9 @@
     }
   },
   "target": {
-    "rows": 0,
-    "accuracy": null,
-    "uncertain_rate": null
+    "rows": 65,
+    "accuracy": 0.8,
+    "uncertain_rate": 0.015
   },
   "confusion": {
     "anger->anger": 5,
