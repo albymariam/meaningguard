@@ -1,0 +1,421 @@
+{
+  "rows": 33,
+  "label": {
+    "accuracy_when_labelled": 0.71,
+    "coverage": 0.939
+  },
+  "sentiment": {
+    "accuracy": 0.633,
+    "uncertain_rate": 0.394,
+    "single_signal": {
+      "emotion:distilroberta": 0.741,
+      "sentiment:xlmr": 0.833
+    }
+  },
+  "sarcasm": {
+    "precision": 0.5,
+    "recall": 1.0,
+    "f1": 0.6666666666666666,
+    "tp": 5,
+    "fp": 5,
+    "fn": 0
+  },
+  "by_sarcasm": {
+    "other": {
+      "rows": 28,
+      "label_accuracy": 0.815,
+      "sentiment_accuracy": 0.76
+    },
+    "sarcastic": {
+      "rows": 5,
+      "label_accuracy": 0.0,
+      "sentiment_accuracy": 0.0
+    }
+  },
+  "irony_scores": [
+    [
+      "s155",
+      "How dare you speak to my mother like that?",
+      false,
+      0.047,
+      false
+    ],
+    [
+      "s158",
+      "We finally won the championship, it feels amazing!",
+      false,
+      0.868,
+      false
+    ],
+    [
+      "s161",
+      "I miss my grandmother more than words can say.",
+      false,
+      0.051,
+      false
+    ],
+    [
+      "s164",
+      "She cried quietly after hearing the news.",
+      false,
+      0.339,
+      false
+    ],
+    [
+      "s167",
+      "I am scared to walk home alone at night.",
+      false,
+      0.074,
+      false
+    ],
+    [
+      "s170",
+      "He opened the box and gasped in shock.",
+      false,
+      0.294,
+      false
+    ],
+    [
+      "s173",
+      "The food was so dirty that I felt sick.",
+      false,
+      0.247,
+      false
+    ],
+    [
+      "s176",
+      "The bus stops near the library.",
+      false,
+      0.82,
+      false
+    ],
+    [
+      "s179",
+      "Fantastic, the internet is down again right before",
+      true,
+      0.99,
+      true
+    ],
+    [
+      "s182",
+      "Brilliant plan, let's leave everything to the last",
+      true,
+      0.971,
+      true
+    ],
+    [
+      "s185",
+      "It was a great plan and it worked well.",
+      false,
+      0.971,
+      true
+    ],
+    [
+      "s188",
+      "This is a fantastic result for the whole team.",
+      false,
+      0.953,
+      true
+    ],
+    [
+      "s191",
+      "He is a teacher.",
+      false,
+      0.841,
+      false
+    ],
+    [
+      "s194",
+      "The weather is pleasant today.",
+      false,
+      0.863,
+      false
+    ],
+    [
+      "s197",
+      "I cannot believe the manager blamed me for his mis",
+      false,
+      0.318,
+      false
+    ],
+    [
+      "s200",
+      "I am livid that my package was left out in the rai",
+      false,
+      0.135,
+      false
+    ],
+    [
+      "s203",
+      "There was mould all over the bread and I nearly ga",
+      false,
+      0.21,
+      false
+    ],
+    [
+      "s206",
+      "I froze when I heard footsteps behind me in the da",
+      false,
+      0.339,
+      false
+    ],
+    [
+      "s209",
+      "The sudden crash downstairs made my heart race wit",
+      false,
+      0.207,
+      false
+    ],
+    [
+      "s212",
+      "Your kind message made my whole week.",
+      false,
+      0.782,
+      false
+    ],
+    [
+      "s215",
+      "What a joy to see my old friend again.",
+      false,
+      0.937,
+      true
+    ],
+    [
+      "s218",
+      "The house feels empty without the dog.",
+      false,
+      0.195,
+      false
+    ],
+    [
+      "s221",
+      "She cried quietly when the train pulled away.",
+      false,
+      0.429,
+      false
+    ],
+    [
+      "s224",
+      "Wow, the parcel came much earlier than promised!",
+      false,
+      0.891,
+      false
+    ],
+    [
+      "s227",
+      "I cannot believe it is you after all these years!",
+      false,
+      0.191,
+      false
+    ],
+    [
+      "s230",
+      "The office is closed on public holidays.",
+      false,
+      0.662,
+      false
+    ],
+    [
+      "s233",
+      "The software is updated automatically every night.",
+      false,
+      0.929,
+      false
+    ],
+    [
+      "s238",
+      "Great job, you managed to spill coffee on the only",
+      true,
+      0.959,
+      true
+    ],
+    [
+      "s241",
+      "What a brilliant idea to schedule the meeting at d",
+      true,
+      0.99,
+      true
+    ],
+    [
+      "s244",
+      "Perfect, the rain starts just as I leave without a",
+      true,
+      0.913,
+      true
+    ],
+    [
+      "s247",
+      "Thanks a lot for taking over my work, it really he",
+      false,
+      0.984,
+      true
+    ],
+    [
+      "s250",
+      "Perfect, the rain stopped just as we reached the p",
+      false,
+      0.74,
+      false
+    ],
+    [
+      "s254",
+      "I am excited and terrified about moving to a new c",
+      false,
+      0.465,
+      true
+    ]
+  ],
+  "irony_sweep": {
+    "0.3": {
+      "precision": 0.21739130434782608,
+      "recall": 1.0,
+      "f1": 0.3571428571428571,
+      "tp": 5,
+      "fp": 18,
+      "fn": 0
+    },
+    "0.4": {
+      "precision": 0.25,
+      "recall": 1.0,
+      "f1": 0.4,
+      "tp": 5,
+      "fp": 15,
+      "fn": 0
+    },
+    "0.5": {
+      "precision": 0.2777777777777778,
+      "recall": 1.0,
+      "f1": 0.4347826086956522,
+      "tp": 5,
+      "fp": 13,
+      "fn": 0
+    },
+    "0.6": {
+      "precision": 0.2777777777777778,
+      "recall": 1.0,
+      "f1": 0.4347826086956522,
+      "tp": 5,
+      "fp": 13,
+      "fn": 0
+    },
+    "0.7": {
+      "precision": 0.29411764705882354,
+      "recall": 1.0,
+      "f1": 0.45454545454545453,
+      "tp": 5,
+      "fp": 12,
+      "fn": 0
+    },
+    "0.8": {
+      "precision": 0.3333333333333333,
+      "recall": 1.0,
+      "f1": 0.5,
+      "tp": 5,
+      "fp": 10,
+      "fn": 0
+    },
+    "0.9": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6666666666666666,
+      "tp": 5,
+      "fp": 5,
+      "fn": 0
+    }
+  },
+  "target": {
+    "rows": 30,
+    "accuracy": 0.733,
+    "uncertain_rate": 0.067
+  },
+  "confusion": {
+    "anger->anger": 2,
+    "anger->joy": 2,
+    "anger->neutral": 2,
+    "anger->surprise": 1,
+    "anger->uncertain": 1,
+    "disgust->disgust": 2,
+    "fear->fear": 4,
+    "joy->joy": 6,
+    "joy->neutral": 1,
+    "joy->surprise": 1,
+    "neutral->disgust": 1,
+    "neutral->neutral": 1,
+    "neutral->sadness": 1,
+    "neutral->uncertain": 1,
+    "sadness->sadness": 4,
+    "surprise->surprise": 3
+  },
+  "sentiment_mistakes": [
+    [
+      "s158",
+      "We finally won the championship, it feels amazing!",
+      "positive",
+      "uncertain"
+    ],
+    [
+      "s179",
+      "Fantastic, the internet is down again right before my deadli",
+      "negative",
+      "uncertain"
+    ],
+    [
+      "s182",
+      "Brilliant plan, let's leave everything to the last minute ag",
+      "negative",
+      "uncertain"
+    ],
+    [
+      "s191",
+      "He is a teacher.",
+      "neutral",
+      "uncertain"
+    ],
+    [
+      "s197",
+      "I cannot believe the manager blamed me for his mistake.",
+      "negative",
+      "uncertain"
+    ],
+    [
+      "s230",
+      "The office is closed on public holidays.",
+      "neutral",
+      "uncertain"
+    ],
+    [
+      "s238",
+      "Great job, you managed to spill coffee on the only clean shi",
+      "negative",
+      "positive"
+    ],
+    [
+      "s241",
+      "What a brilliant idea to schedule the meeting at dawn.",
+      "negative",
+      "uncertain"
+    ],
+    [
+      "s244",
+      "Perfect, the rain starts just as I leave without an umbrella",
+      "negative",
+      "uncertain"
+    ],
+    [
+      "s250",
+      "Perfect, the rain stopped just as we reached the park.",
+      "positive",
+      "uncertain"
+    ],
+    [
+      "s254",
+      "I am excited and terrified about moving to a new city.",
+      "negative",
+      "uncertain"
+    ]
+  ],
+  "notes": [
+    "annotators agree on 103 of 107 rows; kappa(emotion) = 0.95"
+  ],
+  "split": "heldout"
+}

@@ -1,0 +1,178 @@
+{
+  "split": "heldout",
+  "hand": {
+    "n": 11,
+    "systems": {
+      "none": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": null,
+        "tp": 0,
+        "fp": 0,
+        "fn": 7,
+        "false_alarm_rate": 0.0,
+        "recall_by_kind": {
+          "hand": 0.0
+        }
+      },
+      "digits": {
+        "precision": 0.75,
+        "recall": 0.42857142857142855,
+        "f1": 0.5454545454545454,
+        "tp": 3,
+        "fp": 1,
+        "fn": 4,
+        "false_alarm_rate": 0.25,
+        "recall_by_kind": {
+          "hand": 0.42857142857142855
+        }
+      },
+      "full": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 7,
+        "fp": 0,
+        "fn": 0,
+        "false_alarm_rate": 0.0,
+        "recall_by_kind": {
+          "hand": 1.0
+        },
+        "right_code_rate": 1.0
+      }
+    },
+    "repair": {
+      "repairable": 4,
+      "fixed": 4,
+      "rate": 1.0
+    }
+  },
+  "mt_corrupted": {
+    "n": 38,
+    "systems": {
+      "none": {
+        "precision": null,
+        "recall": 0.0,
+        "f1": null,
+        "tp": 0,
+        "fp": 0,
+        "fn": 38,
+        "false_alarm_rate": null,
+        "recall_by_kind": {
+          "digit": 0.0,
+          "currency": 0.0,
+          "negation": 0.0
+        }
+      },
+      "digits": {
+        "precision": 1.0,
+        "recall": 0.9473684210526315,
+        "f1": 0.972972972972973,
+        "tp": 36,
+        "fp": 0,
+        "fn": 2,
+        "false_alarm_rate": null,
+        "recall_by_kind": {
+          "digit": 1.0,
+          "currency": 1.0,
+          "negation": 0.0
+        }
+      },
+      "full": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tp": 38,
+        "fp": 0,
+        "fn": 0,
+        "false_alarm_rate": null,
+        "recall_by_kind": {
+          "digit": 1.0,
+          "currency": 1.0,
+          "negation": 1.0
+        },
+        "right_code_rate": 0.9473684210526315
+      }
+    },
+    "repair": {
+      "repairable": 36,
+      "fixed": 30,
+      "rate": 0.8333333333333334
+    }
+  },
+  "mt_clean": {
+    "n": 81,
+    "flagged": 8
+  },
+  "flagged_mt": [
+    {
+      "id": "s052",
+      "source": "Temperatures fell to -5 degrees.",
+      "target": "तापमान-5 डिग्री तक गिर गया।",
+      "codes": [
+        "NUMBER_CHANGED"
+      ]
+    },
+    {
+      "id": "s061",
+      "source": "Demand surged from 300 units to 450 units.",
+      "target": "मांग 300 इकाइयों से बढ़कर 450 इकाइयों हो गई।",
+      "codes": [
+        "UNVERIFIED",
+        "FACT_ADDED",
+        "FACT_ADDED"
+      ]
+    },
+    {
+      "id": "s064",
+      "source": "Output jumped from 2 lakh to 5 lakh units.",
+      "target": "उत्पादन 2 लाख इकाई से बढ़कर 5 लाख इकाई हो गया।",
+      "codes": [
+        "UNVERIFIED",
+        "FACT_ADDED",
+        "FACT_ADDED"
+      ]
+    },
+    {
+      "id": "s093",
+      "source": "Submit not after Friday.",
+      "target": "शुक्रवार के बाद जमा न करें।",
+      "codes": [
+        "NEGATION_ADDED",
+        "TIMEREL_CHANGED"
+      ]
+    },
+    {
+      "id": "s105",
+      "source": "Submit the form by 15/10/2026.",
+      "target": "फॉर्म को 15/10/2026 के माध्यम से जमा करें।",
+      "codes": [
+        "TIMEREL_CHANGED"
+      ]
+    },
+    {
+      "id": "s117",
+      "source": "You can't not pay the fee.",
+      "target": "आप शुल्क का भुगतान नहीं कर सकते।",
+      "codes": [
+        "NEGATION_UNCERTAIN"
+      ]
+    },
+    {
+      "id": "s131",
+      "source": "In case of delay, call us.",
+      "target": "देरी होने पर हमें कॉल करें।",
+      "codes": [
+        "CLAUSE_COUNT_CHANGED"
+      ]
+    },
+    {
+      "id": "s149",
+      "source": "Prices are up 5% since March, and we expect another 3% rise.",
+      "target": "मार्च के बाद से कीमतें 5 प्रतिशत बढ़ी हैं और हम और 3 प्रतिशत की वृद्धि की उम्मीद करते हैं।",
+      "codes": [
+        "TIMEREL_CHANGED"
+      ]
+    }
+  ]
+}
