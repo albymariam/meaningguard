@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from html import escape
 
+from .hints import hint
 from .verifier import describe_diff
 
 RANK = {"ok": 1, "info": 2, "warning": 3, "error": 4}  # "ok" marks a repaired spot
@@ -110,6 +111,7 @@ class Card:
     message: str
     rows: list  # (what, source value, translation value)
     confidence: str
+    hint: str | None = None  # what to change, in plain words
 
 
 def finding_cards(report) -> list:
@@ -119,7 +121,7 @@ def finding_cards(report) -> list:
         for d in f.diffs:
             src, tgt = describe_diff(d)
             rows.append((d.path, src, tgt))
-        cards.append(Card(f.code, f.severity, f.message, rows, f.confidence))
+        cards.append(Card(f.code, f.severity, f.message, rows, f.confidence, hint(f)))
     return cards
 
 
@@ -194,9 +196,10 @@ def card_html(c: Card) -> str:
         for _, src, tgt in c.rows
     )
     pairs = f'<div class="mg-pair">{pairs}</div>' if pairs else ""
+    fix = f'<p class="mg-hint"><b>Suggested fix:</b> {escape(c.hint)}</p>' if c.hint else ""
     return (
         f'<div class="mg-diag mg-sev-{c.severity}"><div class="mg-diag-head">'
-        f"{c.severity}[{escape(c.code)}]</div><p>{escape(c.message)}</p>{pairs}</div>"
+        f"{c.severity}[{escape(c.code)}]</div><p>{escape(c.message)}</p>{pairs}{fix}</div>"
     )
 
 

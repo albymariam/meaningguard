@@ -108,3 +108,5 @@ mark.mg-ok { background: rgba(21, 128, 61, .15); text-decoration: underline var(
   content: "Options"; color: #fff; font-size: .9rem; font-weight: 500; }
 section[data-testid="stSidebar"] { background: #e6edeb; border-right: 1px solid var(--line); }
 section[data-testid="stSidebar"] h2 { font-size: 1.2rem; color: var(--deep); }
+
+.mg-hint { margin: 0.4rem 0 0; font-size: 0.9rem; opacity: 0.9; }
