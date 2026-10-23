@@ -59,14 +59,14 @@ def main() -> None:
         r for r in rows("sentences.jsonl") if r["category"] in ("emotion", "sarcasm", "plain")
     ]
     header = [
-            "id",
-            "sentence",
-            "proposed_emotion",
-            "proposed_sarcasm",
-            "your_emotion",
-            "your_sarcasm (Y/N)",
-            "notes",
-        ]
+        "id",
+        "sentence",
+        "proposed_emotion",
+        "proposed_sarcasm",
+        "your_emotion",
+        "your_sarcasm (Y/N)",
+        "notes",
+    ]
 
     def body(items):
         return [

@@ -134,3 +134,16 @@ def test_tone_side_html():
     assert "sentiment: negative" in html and "emotion: anger" in html
     assert "possible sarcasm" not in R.tone_side_html("x", {**side, "sarcasm": None})
     assert "not available" in R.tone_side_html("Hindi translation", None)
+
+
+def test_tone_side_shows_the_emotion_distribution():
+    side = {
+        "sentiment": "negative",
+        "emotion": "uncertain",
+        "emotions": [("fear", 0.44), ("joy", 0.3)],
+        "confidence": 0.5,
+        "sarcasm": False,
+        "signals": [],
+    }
+    html = R.tone_side_html("English source", side)
+    assert "emotion: fear (low confidence)" in html and "44%" in html and "30%" in html

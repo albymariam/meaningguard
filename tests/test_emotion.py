@@ -10,6 +10,7 @@ from meaningguard.emotion import (
     EmotionAnalyzer,
     HfClassifier,
     Signal,
+    _record,
     build_analyzer,
     canonical_scores,
     is_sarcastic,
@@ -250,3 +251,8 @@ def test_neutral_guard_can_be_switched_off():
     neutral = sig("neutral", 0.9)
     assert is_sarcastic(0.95, neutral, neutral, S) is False
     assert is_sarcastic(0.95, neutral, neutral, replace(S, neutral_guard=False)) is True
+
+
+def test_record_keeps_the_full_emotion_distribution():
+    rec = _record([], "joy", False, EmotionSettings(), (), {"joy": 0.7123, "fear": 0.2})
+    assert rec["emotions"] == {"joy": 0.712, "fear": 0.2}

@@ -1,4 +1,4 @@
-"""MeaningGuard-Indic: check that an English-to-Hindi translation keeps the facts of the source.
+"""MeaningGuard: check that an English-to-Hindi translation keeps the facts of the source.
 
 python -m streamlit run app.py
 """
@@ -30,7 +30,7 @@ EXAMPLES = [
 TONE_DEFAULT = os.environ.get("MEANINGGUARD_TONE", "1") != "0"  # the Space sets it to 0
 THEME = Path(__file__).parent / "meaningguard" / "theme.css"
 HERO = """<div class="mg-hero"><div>
-<h1 class="mg-title">MeaningGuard-Indic</h1>
+<h1 class="mg-title">MeaningGuard</h1>
 <p class="mg-sub">Checks that an English-to-Hindi translation keeps every number,
 negation and condition.</p>
 <div class="mg-stages"><span>lexer</span><span>parser</span><span>verifier</span><span>repair</span>
@@ -130,12 +130,15 @@ def show_repair(result) -> None:
 
 
 def show_tone(result) -> None:
-    st.subheader("Tone")
+    st.subheader("Emotion and tone")
     data = render.tone_rows(result.tone)
     if data is None:
         st.caption("The tone check is off (sidebar).")
         return
-    st.caption("Advisory: models read emotion and sarcasm; this never changes the Hindi text.")
+    st.caption(
+        "Advisory: models read the emotion of the English and of the Hindi (through its English "
+        "back-translation); this never changes the Hindi text."
+    )
     for column, (name, side) in zip(st.columns(2), data["sides"], strict=True):
         html(render.tone_side_html(name, side), column)
         if side:
@@ -175,16 +178,16 @@ def show(result) -> None:
 
 
 def main() -> None:
-    st.set_page_config(
-        page_title="MeaningGuard-Indic", layout="wide", initial_sidebar_state="collapsed"
-    )
+    st.set_page_config(page_title="MeaningGuard", layout="wide", initial_sidebar_state="collapsed")
     html(f"<style>{THEME.read_text('utf-8')}</style>")
     html(HERO)
     with st.sidebar:
         st.header("Options")
         repair = st.toggle("Repair wrong numbers and currencies", True)
         tone = st.toggle(
-            "Tone and sarcasm check", TONE_DEFAULT, help="About 4 s more per sentence on CPU."
+            "Emotion, tone and sarcasm check",
+            TONE_DEFAULT,
+            help="About 4 s more per sentence on CPU.",
         )
         google = st.toggle("Google fallback", False, help="Unofficial and rate limited.")
         sidebar_cache(get_pipeline(google).cache)

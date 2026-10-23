@@ -96,7 +96,7 @@ def own_translation(at, english, hindi):
 
 
 def test_first_page_has_no_error(app):
-    assert not app.exception and "MeaningGuard-Indic" in texts(app.markdown)
+    assert not app.exception and "MeaningGuard" in texts(app.markdown)
     assert [b.label for b in app.button][:2] == ["Wrong number", "Wrong currency"]
 
 
@@ -136,7 +136,7 @@ def test_tone_warning_changes_the_verdict_and_toggle_turns_tone_off(app):
     body = texts(at.markdown)
     assert "Check these points" in body and "mg-status-warn" in body
     assert "warning[TONE_POLARITY_FLIPPED]" in body
-    next(t for t in at.toggle if t.label.startswith("Tone")).set_value(False)
+    next(t for t in at.toggle if t.label.startswith("Emotion")).set_value(False)
     at = press(at, "Check")
     assert "Meaning preserved" in texts(at.markdown) and "tone check is off" in texts(at.caption)
 

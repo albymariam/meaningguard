@@ -110,3 +110,11 @@ section[data-testid="stSidebar"] { background: #e6edeb; border-right: 1px solid 
 section[data-testid="stSidebar"] h2 { font-size: 1.2rem; color: var(--deep); }
 
 .mg-hint { margin: 0.4rem 0 0; font-size: 0.9rem; opacity: 0.9; }
+
+.mg-chip.mg-emotion { background: var(--deep); color: #fff; font-weight: 600; }
+.mg-bars { margin-top: .7rem; }
+.mg-bar { display: flex; align-items: center; gap: .5rem; font-size: .82rem; margin: .12rem 0; }
+.mg-bar-name { width: 4.6rem; color: var(--muted); }
+.mg-bar-track { flex: 1; height: 6px; background: #e3ebe9; border-radius: 99px; overflow: hidden; }
+.mg-bar-track i { display: block; height: 100%; background: var(--brand); }
+.mg-bar-pct { width: 2.4rem; text-align: right; color: var(--muted); }

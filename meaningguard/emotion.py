@@ -146,9 +146,10 @@ def is_sarcastic(irony_prob: float, surface: Signal | None, emotion: Signal | No
     return conflict and irony_prob >= s.irony_low
 
 
-def _record(signals, label, sarcasm, settings, extra=()) -> dict:
+def _record(signals, label, sarcasm, settings, extra=(), emotions=None) -> dict:
     sentiment, confidence, votes = vote(signals, settings)
     return {
+        "emotions": {k: round(v, 3) for k, v in (emotions or {}).items()},
         "sentiment": sentiment,
         "label": label,
         "possible_sarcasm": sarcasm,
@@ -160,6 +161,7 @@ def _record(signals, label, sarcasm, settings, extra=()) -> dict:
 
 def _uncertain() -> dict:
     return {
+        "emotions": {},
         "sentiment": "uncertain",
         "label": "uncertain",
         "possible_sarcasm": False,
@@ -184,11 +186,14 @@ class EmotionAnalyzer:
         if not text.strip():
             return _uncertain()
         surface = _signal("xlmr", self.sentiment.classify(text), "sentiment")
-        emotion = _signal("distilroberta", self.emotion.classify(text), "emotion")
+        scores = self.emotion.classify(text)
+        emotion = _signal("distilroberta", scores, "emotion")
         irony_prob = self.irony.classify(text).get("irony", 0.0)
         extra = [Signal("irony:roberta", "irony", irony_prob, None)]
         sarcasm = is_sarcastic(irony_prob, surface, emotion, self.settings)
-        return _record([surface, emotion], self._label(emotion), sarcasm, self.settings, extra)
+        return _record(
+            [surface, emotion], self._label(emotion), sarcasm, self.settings, extra, scores
+        )
 
     def analyze_target(self, text: str, english: str | None = None) -> dict:
         """Hindi translation: sentiment on the Hindi, and sentiment plus emotion on its English
@@ -196,12 +201,13 @@ class EmotionAnalyzer:
         if not text.strip():
             return _uncertain()
         signals = [_signal("xlmr-hi", self.sentiment.classify(text), "sentiment")]
-        emotion = None
+        emotion, scores = None, None
         if english and english.strip():
             signals.append(_signal("xlmr-back", self.sentiment.classify(english), "sentiment"))
-            emotion = _signal("distilroberta-back", self.emotion.classify(english), "emotion")
+            scores = self.emotion.classify(english)
+            emotion = _signal("distilroberta-back", scores, "emotion")
             signals.append(emotion)
-        return _record(signals, self._label(emotion), None, self.settings)
+        return _record(signals, self._label(emotion), None, self.settings, (), scores)
 
     def close(self) -> None:
         for model in (self.sentiment, self.emotion, self.irony):

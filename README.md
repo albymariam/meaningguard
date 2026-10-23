@@ -1,4 +1,4 @@
-# MeaningGuard-Indic
+# MeaningGuard
 
 A compiler-style verifier for English to Hindi translation. It lexes and parses both sentences into a
 typed AST, canonicalizes them, compiles each to an IR (`mgir/1`) and compares the facts: numbers,
@@ -28,7 +28,7 @@ Never commit it. `python -m meaningguard.check_models --full` checks the environ
     build_pipeline().check("Pay ₹5 lakh.", "५० लाख रुपये दें।")          # check a translation you have
 
 IndicTrans2 is tried first, then the Google fallback (`runtime.google_fallback` in `config.yaml`).
-`build_pipeline(tone=True)` adds the emotion and sarcasm check (`docs/spec/08_emotion.md`).
+`build_pipeline(tone=True)` adds the emotion check (7 emotions with probabilities, sentiment, possible sarcasm) (`docs/spec/08_emotion.md`).
 Model outputs are cached in `.cache/meaningguard.sqlite` (`python -m meaningguard.cache stats|clear`).
 
 Web app: `python -m streamlit run app.py`.

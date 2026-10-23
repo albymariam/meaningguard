@@ -144,6 +144,9 @@ def tone_rows(tone) -> dict | None:
                 {
                     "sentiment": rec["sentiment"],
                     "emotion": rec["label"],
+                    "emotions": sorted(
+                        (rec.get("emotions") or {}).items(), key=lambda kv: kv[1], reverse=True
+                    ),
                     "confidence": rec["confidence"],
                     "sarcasm": rec["possible_sarcasm"],
                     "signals": [(s["name"], s["label"], s["prob"]) for s in rec["signals"]],
@@ -208,16 +211,27 @@ def tone_side_html(name: str, side: dict | None) -> str:
         head = f'<div class="mg-tone-name">{escape(name)}</div>'
         return f'<div class="mg-tone">{head}not available</div>'
     sentiment = escape(side["sentiment"])
+    emotions = side.get("emotions") or []
+    label = side["emotion"]
+    if label == "uncertain" and emotions:
+        label = f"{emotions[0][0]} (low confidence)"
     chips = [
+        f'<span class="mg-chip mg-emotion">emotion: {escape(label)}</span>',
         f'<span class="mg-chip mg-s-{sentiment}">sentiment: {sentiment}</span>',
-        f'<span class="mg-chip">emotion: {escape(side["emotion"])}</span>',
     ]
+    bars = "".join(
+        f'<div class="mg-bar"><span class="mg-bar-name">{escape(name)}</span>'
+        f'<span class="mg-bar-track"><i style="width:{round(p * 100)}%"></i></span>'
+        f'<span class="mg-bar-pct">{round(p * 100)}%</span></div>'
+        for name, p in emotions
+    )
     if side["sarcasm"]:
         chips.append('<span class="mg-chip mg-sarcasm">possible sarcasm</span>')
     pct = round(side["confidence"] * 100)
     return (
         f'<div class="mg-tone"><div class="mg-tone-name">{escape(name)}</div>'
         f'<div class="mg-chips">{"".join(chips)}</div>'
+        f'<div class="mg-bars">{bars}</div>'
         f'<div class="mg-meter"><span style="width:{pct}%"></span></div>'
         f'<div class="mg-meter-label">confidence {pct}%</div></div>'
     )
